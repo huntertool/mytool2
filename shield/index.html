@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shield Generator</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            padding-top: 50px;
+        }
+        .form-section {
+            margin-bottom: 30px;
+        }
+        .shield {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .shield img {
+            margin-right: 10px;
+        }
+        .shield .code {
+            background-color: #f4f4f4;
+            padding: 5px;
+            border: 1px solid #ddd;
+            display: inline-block;
+            cursor: pointer;
+            white-space: pre;
+        }
+        .color-picker {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+        }
+        .color-picker label {
+            margin-right: 10px;
+        }
+        .color-picker input[type="color"] {
+            border: none;
+            width: 40px;
+            height: 40px;
+            padding: 0;
+            -webkit-appearance: none;
+            appearance: none;
+            cursor: pointer;
+        }
+        .color-picker input[type="color"]::-webkit-color-swatch-wrapper {
+            padding: 0;
+        }
+        .color-picker input[type="color"]::-webkit-color-swatch {
+            border: none;
+        }
+    </style>
+    <style>
+    .more-button {
+      margin-top: 20px;
+    }
+  </style>
+  <div class="container">
+    <button id="moreButton" class="btn btn-primary more-button">More</button>
+  </div>
+
+  <script>
+    document.getElementById('moreButton').addEventListener('click', function() {
+      window.location.href = 'more.html';
+    });
+  </script>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center">Shield Generator</h1>
+        <div class="form-section">
+            <h2>Generate Custom Shields</h2>
+            <form id="custom-shield-form">
+                <div class="form-group">
+                    <label for="shield_name">Enter Shield Name:</label>
+                    <input type="text" class="form-control" id="shield_name">
+                </div>
+                <div class="color-picker">
+                    <label for="color_left">Left Color:</label>
+                    <input type="color" id="color_left" value="#000000">
+                    <label for="color_right">Right Color:</label>
+                    <input type="color" id="color_right" value="#000000">
+                </div>
+                <button type="button" class="btn btn-primary mt-3" onclick="generateCustomShields()">Generate Shields</button>
+            </form>
+        </div>
+        <div class="form-section">
+            <h2>Generate Social Media Shields</h2>
+            <form id="social-media-shield-form">
+                <div class="form-group">
+                    <label for="social_media_username">Enter Social Media Username:</label>
+                    <input type="text" class="form-control" id="social_media_username">
+                </div>
+                <div class="color-picker">
+                    <label for="social_color_left">Left Color:</label>
+                    <input type="color" id="social_color_left" value="#000000">
+                    <label for="social_color_right">Right Color:</label>
+                    <input type="color" id="social_color_right" value="#000000">
+                </div>
+                <button type="button" class="btn btn-primary mt-3" onclick="generateSocialMediaShields()">Generate Social Media Shields</button>
+            </form>
+        </div>
+        <div class="form-section">
+            <h2>Generate Programming Language Shields</h2>
+            <form id="language-shield-form">
+                <div class="form-group">
+                    <label for="language_text">Enter Text for Language Shields:</label>
+                    <input type="text" class="form-control" id="language_text">
+                </div>
+                <div class="color-picker">
+                    <label for="language_color_left">Left Color:</label>
+                    <input type="color" id="language_color_left" value="#000000">
+                    <label for="language_color_right">Right Color:</label>
+                    <input type="color" id="language_color_right" value="#000000">
+                </div>
+                <button type="button" class="btn btn-primary mt-3" onclick="generateLanguageShields()">Generate Language Shields</button>
+            </form>
+        </div>
+        <hr>
+        <div id="shields-container"></div>
+    </div>
+    <script>
+        function generateCustomShields() {
+            const name = document.getElementById('shield_name').value;
+            const colorLeft = document.getElementById('color_left').value.replace('#', '%23');
+            const colorRight = document.getElementById('color_right').value.replace('#', '%23');
+            const styles = ['flat', 'flat-square', 'plastic', 'for-the-badge', 'social'];
+            const words = name.split(' ');
+            const encodedName = encodeURIComponent(name);
+            const shieldCodes = [];
+
+            if (words.length === 2) {
+                const [word1, word2] = words.map(encodeURIComponent);
+                styles.forEach(style => {
+                    const code = `![${name}](https://img.shields.io/badge/${word1}-${word2}-${colorRight}?style=${style}&labelColor=${colorLeft})`;
+                    shieldCodes.push(code);
+                });
+            } else {
+                styles.forEach(style => {
+                    const code = `![${name}](https://img.shields.io/badge/${encodedName}-${colorRight}?style=${style}&labelColor=${colorLeft})`;
+                    shieldCodes.push(code);
+                });
+            }
+
+            displayShields(shieldCodes, `Shields for "${name}"`);
+        }
+
+        function generateSocialMediaShields() {
+            const username = document.getElementById('social_media_username').value;
+            const colorLeft = document.getElementById('social_color_left').value.replace('#', '%23');
+            const colorRight = document.getElementById('social_color_right').value.replace('#', '%23');
+            const socialMedia = [
+                'twitter', 'youtube', 'facebook', 'instagram', 'github', 
+                'medium', 'linkedin', 'tiktok', 'snapchat', 'pinterest', 'telegram'
+            ];
+            const shieldCodes = socialMedia.map(platform => {
+                return `![${platform}](https://img.shields.io/badge/${platform}-${username}-${colorRight}?style=flat-square&logo=${platform}&logoColor=white&labelColor=${colorLeft})`;
+            });
+
+            displayShields(shieldCodes, `Social Media Shields for "${username}"`);
+        }
+
+        function generateLanguageShields() {
+            const text = document.getElementById('language_text').value;
+            const colorLeft = document.getElementById('language_color_left').value.replace('#', '%23');
+            const colorRight = document.getElementById('language_color_right').value.replace('#', '%23');
+            const programmingLanguages = [
+                'bash', 'html', 'go', 'perl', 'rust', 'c', 'cpp', 'csharp', 
+                'python', 'javascript', 'java', 'kotlin', 'typescript', 'php', 
+                'swift', 'ruby', 'dart'
+            ];
+            const shieldCodes = programmingLanguages.map(language => {
+                return `![${text}](https://img.shields.io/badge/${encodeURIComponent(text)}-${language}-${colorRight}?style=flat-square&logo=${language}&logoColor=white&labelColor=${colorLeft})`;
+            });
+
+            displayShields(shieldCodes, `Programming Language Shields for "${text}"`);
+        }
+
+        function displayShields(shieldCodes, title) {
+            const container = document.getElementById('shields-container');
+            container.innerHTML = `<h2>${title}</h2>`;
+            shieldCodes.forEach(code => {
+                const div = document.createElement('div');
+                div.className = 'shield';
+                div.innerHTML = `
+                    <img src="${code.split('(')[1].split(')')[0]}" alt="${title}">
+                    <span class="code" onclick="copyToClipboard('${code}')">${code}</span>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Code copied to clipboard');
+            }).catch(err => {
+                console.error('Could not copy text: ', err);
+            });
+        }
+    </script>
+    
+</body>
+</html>

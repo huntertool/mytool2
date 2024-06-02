@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shield Generator</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            padding-top: 50px;
+        }
+        .form-section {
+            margin-bottom: 30px;
+        }
+        .shield {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .shield img {
+            margin-right: 10px;
+        }
+        .shield .code {
+            background-color: #f4f4f4;
+            padding: 5px;
+            border: 1px solid #ddd;
+            display: inline-block;
+            cursor: pointer;
+            white-space: pre;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center">Shield Generator</h1>
+        <div class="form-section">
+            <h2>Generate Custom Shields</h2>
+            <form id="shieldForm">
+                <div class="form-group">
+                    <label for="shield_name">Enter Shield Name:</label>
+                    <input type="text" class="form-control" id="shield_name" name="shield_name" required>
+                </div>
+                <button type="submit" class="btn btn-primary mt-3">Generate Shields</button>
+            </form>
+        </div>
+        <hr>
+        <div id="results"></div>
+    </div>
+    <script>
+        function generateShieldCode(name) {
+            const styles = ['flat', 'flat-square', 'plastic', 'for-the-badge', 'social'];
+            const colors = ['blue', 'green', 'red', 'yellow', 'orange', 'purple', 'pink', 'blueviolet', 'brightgreen'];
+            const shieldCodes = [];
+            const words = name.split(' ');
+            const encodedName = encodeURIComponent(name);
+
+            // Single-color shields
+            styles.forEach(style => {
+                colors.forEach(color => {
+                    const code = `![${name}](https://img.shields.io/badge/${encodedName}-${color}?style=${style})`;
+                    shieldCodes.push(code);
+                });
+            });
+
+            // Two-color shields
+            if (words.length === 2) {
+                const [word1, word2] = words;
+                styles.forEach(style => {
+                    colors.forEach(colorA => {
+                        colors.forEach(colorB => {
+                            if (colorA !== colorB) {
+                                const code = `![${name}](https://img.shields.io/badge/${encodeURIComponent(word1)}-${encodeURIComponent(word2)}-${colorB}?style=${style}&labelColor=${colorA}&color=${colorB})`;
+                                shieldCodes.push(code);
+                            }
+                        });
+                    });
+                });
+            } else {
+                styles.forEach(style => {
+                    colors.forEach(colorA => {
+                        colors.forEach(colorB => {
+                            if (colorA !== colorB) {
+                                const code = `![${name}](https://img.shields.io/badge/${encodedName}-${colorA}-${colorB}?style=${style}&labelColor=${colorA}&color=${colorB})`;
+                                shieldCodes.push(code);
+                            }
+                        });
+                    });
+                });
+            }
+
+            return shieldCodes;
+        }
+
+        document.getElementById('shieldForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const shieldName = document.getElementById('shield_name').value;
+            const shieldCodes = generateShieldCode(shieldName);
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = `<h2>Shields for "${shieldName}"</h2>`;
+            shieldCodes.forEach(code => {
+                const shieldElement = document.createElement('div');
+                shieldElement.className = 'shield';
+                shieldElement.innerHTML = `
+                    <img src="${code.split('(')[1].split(')')[0]}" alt="${shieldName}">
+                    <span class="code" onclick="copyToClipboard('${code}')">${code}</span>
+                `;
+                resultsDiv.appendChild(shieldElement);
+            });
+        });
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(function() {
+                alert('Code copied to clipboard');
+            }, function(err) {
+                console.error('Could not copy text: ', err);
+            });
+        }
+    </script>
+</body>
+</html>
