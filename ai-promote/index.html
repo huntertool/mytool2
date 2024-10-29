@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ai Prompt</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            text-align: center;
+        }
+        .form-container {
+            display: none;
+            text-align: left;
+            margin-top: 20px;
+        }
+        .form-container.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Ai Prompt</h1>
+        <div class="list-group">
+            <button class="list-group-item list-group-item-action" onclick="showForm('newsPrompt')">News Promot</button>
+            <button class="list-group-item list-group-item-action" onclick="showForm('titlePrompt')">Title Promot</button>
+            <button class="list-group-item list-group-item-action" onclick="showForm('tagPrompt')">FB, YT, INS Tag Promot</button>
+        </div>
+
+        <!-- News Prompt Form -->
+        <div id="newsPrompt" class="form-container">
+            <h2>News Promot</h2>
+            <label for="newsDescription">সংবাদের বিবরণ দিন (স্ক্রিপ্ট):</label>
+            <textarea id="newsDescription" class="form-control" rows="4"></textarea>
+            <br>
+            <button class="btn btn-primary" onclick="generateNews()">Generate</button>
+            <div id="generatedNewsOutput"></div>
+        </div>
+
+        <!-- Title Prompt Form -->
+        <div id="titlePrompt" class="form-container">
+            <h2>Title Promot</h2>
+            <label for="titleText">Title:</label>
+            <textarea id="titleText" class="form-control" rows="2"></textarea>
+            <br>
+            <button class="btn btn-primary" onclick="generateTitle()">Generate</button>
+            <div id="generatedTitleOutput"></div>
+        </div>
+
+        <!-- Tag Prompt Form -->
+        <div id="tagPrompt" class="form-container">
+            <h2>FB, YT, INS Tag Promot</h2>
+            <label for="topic">Topic:</label>
+            <input type="text" id="topic" class="form-control"><br>
+            <label for="pageName">Page/Channel Name:</label>
+            <input type="text" id="pageName" class="form-control"><br>
+            <label for="category">Channel or Page Category:</label>
+            <input type="text" id="category" class="form-control"><br>
+            <label>Hash Tag Language:</label><br>
+            <div class="form-check">
+                <input type="checkbox" id="bangla" class="form-check-input" value="Bangla">
+                <label class="form-check-label" for="bangla">বাংলা</label>
+            </div>
+            <div class="form-check">
+                <input type="checkbox" id="english" class="form-check-input" value="English">
+                <label class="form-check-label" for="english">English</label>
+            </div>
+            <div class="form-check">
+                <input type="checkbox" id="hindi" class="form-check-input" value="Hindi">
+                <label class="form-check-label" for="hindi">Hindi</label>
+            </div>
+            <br>
+            <button class="btn btn-primary" onclick="generateTags()">Generate</button>
+            <div id="generatedTagOutput"></div>
+        </div>
+    </div>
+
+    <script>
+        function showForm(formId) {
+            document.querySelectorAll('.form-container').forEach(form => {
+                form.classList.remove('active');
+            });
+            document.getElementById(formId).classList.add('active');
+        }
+
+        function copyToClipboard(text, outputElement) {
+            navigator.clipboard.writeText(text).then(() => {
+                outputElement.innerHTML = `<p>${text}</p><button class="btn btn-secondary mt-2" onclick="copyToClipboard('${text}', this.parentNode)">Copy</button>`;
+            });
+        }
+
+        function generateNews() {
+            const newsDescription = document.getElementById("newsDescription").value;
+            if (!newsDescription) {
+                alert("Please provide news details.");
+                return;
+            }
+            const text = `নিচে দেওয়া বিষয়গুলোর উপর ভিত্তি করে একটি সংবাদের জন্য প্রতিবেদন তৈরি করে দাও এবং খুব সুন্দর করে যাতে মানুষের দৃষ্টি আকর্ষণ হয় | যদি কোন বানান ভুল থাকে সেটা কেউ ঠিক করে দিবে\n\n${newsDescription}`;
+            copyToClipboard(text, document.getElementById("generatedNewsOutput"));
+        }
+
+        function generateTitle() {
+            const titleText = document.getElementById("titleText").value;
+            if (!titleText) {
+                alert("Please provide a title.");
+                return;
+            }
+            const text = `Relying on and based on the above report Write a title between 30 Bengali and English words that will rank well for social media. Of course, the title should be written in a way that people search many times and it will easily be in the top ranking\n\n${titleText}`;
+            copyToClipboard(text, document.getElementById("generatedTitleOutput"));
+        }
+
+        function generateTags() {
+            const topic = document.getElementById("topic").value;
+            const pageName = document.getElementById("pageName").value;
+            const category = document.getElementById("category").value;
+            const languages = [];
+            if (document.getElementById("bangla").checked) languages.push("বাংলা");
+            if (document.getElementById("english").checked) languages.push("English");
+            if (document.getElementById("hindi").checked) languages.push("Hindi");
+            if (!topic || !pageName || !category || languages.length === 0) {
+                alert("Please fill in all fields and select at least one language.");
+                return;
+            }
+            const text = `Based on the above, create some hash tags (#) that match our title report, and hash tags that have top ranking and viral ranking like On Social Media. Our YouTube channel is called ${pageName}, and this is a ${category} channel, so news-related hashtags should be generated. The hashtags will include languages: ${languages.join(", ")}.\n\nTopic: ${topic}\nPage Name: ${pageName}\nCategory: ${category}`;
+            copyToClipboard(text, document.getElementById("generatedTagOutput"));
+        }
+    </script>
+</body>
+</html>
