@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Serial Confirmation SMS</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+        }
+        .form-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        label {
+            font-weight: bold;
+            margin-bottom: 8px;
+            display: block;
+        }
+        input, select, button, textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        textarea {
+            resize: none;
+            height: 150px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Serial Confirmation SMS</h1>
+<div class="form-container">
+    <label for="patientName">রোগীর নাম:</label>
+    <input type="text" id="patientName" placeholder="রোগীর নাম লিখুন" required>
+
+    <label for="appointmentDate">তারিখ:</label>
+    <input type="date" id="appointmentDate" required>
+
+    <label for="appointmentPlace">স্থান:</label>
+    <select id="appointmentPlace" required>
+        <option value="৫৬/১, বায়তুল ভিউ টাওয়ার, (বায়তুল মোকাররম উত্তর গেইটের বিপরীতে) লিফটের ১১, পুরানা পল্টন, ঢাকা। শনি, রবি ও সোমবার, সকাল ১০ টা হতে বিকাল ৫টা | https://maps.app.goo.gl/HhH5wwv6FEHDmMqP6">
+            ৫৬/১, বায়তুল ভিউ টাওয়ার, পুরানা পল্টন, ঢাকা।
+        </option>
+        <option value="শ্মশানঘাট, হবিগঞ্জ | https://maps.app.goo.gl/cLMhoUwAfudBDkwWA">
+            শ্মশানঘাট, হবিগঞ্জ
+        </option>
+    </select>
+
+    <label for="appointmentTime">সময়:</label>
+    <select id="appointmentTime" required>
+        <option value="সকাল ১০ টা">সকাল ১০ টা</option>
+        <option value="দুপুর ১২ টা">দুপুর ১২ টা</option>
+        <option value="বিকাল ৩ টা">বিকাল ৩ টা</option>
+        <option value="সন্ধ্যা ৫ টা">সন্ধ্যা ৫ টা</option>
+    </select>
+
+    <button onclick="generateMessage()">জেনারেট</button>
+
+    <textarea id="outputMessage" readonly placeholder="এখানে মেসেজ প্রদর্শিত হবে..."></textarea>
+    <button onclick="copyToClipboard()">কপি ক্লিপবোর্ড</button>
+</div>
+
+<script>
+    function generateMessage() {
+        const name = document.getElementById("patientName").value;
+        const date = document.getElementById("appointmentDate").value;
+        const place = document.getElementById("appointmentPlace").value;
+        const time = document.getElementById("appointmentTime").value;
+
+        if (!name || !date || !place || !time) {
+            alert("সব তথ্য পূরণ করুন।");
+            return;
+        }
+
+        const message = `প্রিয় ${name},\n\nআপনার সুবিধার্থে ডাঃ এস. এম. সরওয়ার স্যারের সাথে আপনার অ্যাপয়েন্টমেন্ট সফলভাবে বুক করা হয়েছে।\n\n• তারিখ: ${date}\n• সময়: ${time}\n• স্থান: ${place}\n\nআপনার নির্ধারিত সময়ে উপস্থিত থাকার জন্য অনুরোধ করা হলো। কোনো প্রকার সাহায্যের প্রয়োজন হলে এই নাম্বারে কল করুন: 01617044121 অথবা আমাদের ফেসবুক পেজে মেসেজ করুন।\n\nধন্যবাদান্তে,\nগণস্বাস্থ্য হোমিও\nযোগাযোগ: 01617044121`;
+
+        document.getElementById("outputMessage").value = message;
+    }
+
+    function copyToClipboard() {
+        const outputMessage = document.getElementById("outputMessage");
+        outputMessage.select();
+        outputMessage.setSelectionRange(0, 99999); // For mobile devices
+        navigator.clipboard.writeText(outputMessage.value)
+            .then(() => alert("মেসেজটি ক্লিপবোর্ডে কপি হয়েছে।"))
+            .catch(err => alert("কপি করতে ব্যর্থ হয়েছে।"));
+    }
+</script>
+
+</body>
+</html>
