@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Response Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        textarea, input {
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #response {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+    <h1>Response Generator</h1>
+    <label for="userInput">Enter Comment or Question:</label>
+    <textarea id="userInput" rows="4" placeholder="Type your comment or question here..."></textarea>
+    <button onclick="generateResponse()">Generate Response</button>
+
+    <div id="responseContainer" style="display: none;">
+        <h3>Generated Response:</h3>
+        <div id="response"></div>
+        <button onclick="copyToClipboard()">Copy to Clipboard</button>
+    </div>
+
+    <script>
+        function generateResponse() {
+            const userInput = document.getElementById('userInput').value.trim();
+            if (userInput === '') {
+                alert('Please enter a comment or question.');
+                return;
+            }
+
+            const response = `আমাদের এটি ফেসবুক Page: Dr. SM Sarwer, এই পেইজে আমরা নিয়মিত ক্যান্সার রোগী যারা সুস্থ হয়ে যায় তাদের সাক্ষাৎকারের ভিডিও নিয়ে আমরা ভিডিওগুলো পোস্ট করি এবং তারপর সেগুলোকে বুস্ট করি। আমাদের ডাক্তার স্যারের নাম ক্যান্সার স্পেশালিস্ট ডাক্তার এস এম সরওয়ার, আমরা যেসব রোগের চিকিৎসা করি : ক্যান্সার, ব্লাড ক্যান্সার, থ্যালাসেমিয়া, কিডনী, প্যারালাইসিস, অচল, শিশু ও বৃদ্ধ হাড় বাঁকা, হাড় নরম, হাড় চিকন, টিউমার, প্রস্রাবের রাস্তায় পাথর, পিত্তে পাথর, ব্লাড প্রেসার, স্মৃতি শক্তি হ্রাস, চক্ষুরোগ, পলিপাশ, সাইনোসাইটিস, হার্নিয়া পীড়া, হার্ট দুর্বলতা, লিভারের পীড়া, রক্তস্রাব, একশিরা, ডায়াবেটিস, বহুমূত্র, বাত ব্যাথা, বিষাক্ত ফোঁড়া, ব্রণ, স্থনের পীড়া, জরায়ুর পীড়া, শ্বাস কষ্ট, হাঁপানী, দন্তের পীড়া, দাউদ, দলফিসকি, গায়ের চামড়া মোমের মত সাদা, ধনুষ্টংকার, যৌন পীড়া, ধ্বজভঙ্গ, কানের পীড়া, নাকের পীড়া, গ্যাস্ট্রিক, পেটের পীড়া, চর্মরোগ, পুঁজ, স্রাব, প্রসব বেদনা, ফুসফুসের পীড়া, সুতিকা মেয়েদের সাদা স্রাব, স্ত্রীরোগ, স্বপ্নদোষ, হাঁচি, হাম, যক্ষা, হৃদরোগ, অর্শ্ব, পাইলস, গেজ ইত্যাদি পুরাতন কঠিন ও জঠিল রোগের চিকৎসা করা হয়। এবং এগুলা চিকিৎসা করায় আমাদের অভিজ্ঞতা ৩০ বছরের। ‌ এখন পর্যন্ত হাজারো রোগী আমাদের কাছ থেকে সুস্থ হয়ে গিয়েছে অনেকে সুস্থ হয়ে সুন্দর জীবন যাপন করছে । 
+
+যদি  রোগীর রোগ : ক্যান্সার, ব্লাড ক্যান্সার, থ্যালাসেমিয়া, কিডনী, Age হয়ে থাকে (অথবা ক্যান্সারের সাথে সম্পৃক্ত ক্যান্সার ই হয়েছে কিন্তু তার ব্যতিক্রমী অনেক নাম অথবা অনেক ধরনের রয়েছে তাহলে) তাহলে তার খরচ প্রথম মাসে ৩৫ হাজার টাকা এবং আরও তিন মাসে ১০ হাজার টাকা করে ৩০ হাজার টাকা সর্বমোট খরচ হবে ৬৫ হাজার টাকা। 
+এবং উপরের ওই পাঁচটি রোগ বাদে অন্য সকল রোগের ক্ষেত্রে প্রথম মাসে খরচ হবে 4000 টাকা এবং তার পরের মাসে এক হাজার টাকা করে তিন মাস ।সর্বমোট চার মাসে সাত হাজার টাকা। 
+
+আমরা সর্বোচ্চ চেষ্টা করি রোগীকে সুস্থ করার আমাদের চিকিৎসার মাধ্যমে। এগুলো হচ্ছে আমাদের কোন স্বাস্থ্য হোমিও এর ব্যবস্থাপনা এর নিয়ম কানুন এবং চিকিৎসা ব্যবস্থা। অনেক ব্যক্তি আছে আমাদের বিভিন্ন চ্যানেল অথবা facebook পেইজের কমেন্টে অথবা মেসেজে অনেক কিছু লেখেন। তারা অনেক সময় আমাদের ঠিকানা জানতে চায় এবং আমাদের চেম্বার কোথায় কোথায় সেটাও জানতে চাই : 
+
+আমাদের দুটি চেম্বার রয়েছে একটি থাকা এবং অন্যটি সিলেটের হবিগঞ্জ! 
+
+ঢাকা চেম্বার:
+
+৫৬/১ (বায়তুল মোকাররম উত্তর গেইটের বিপরীতে) লিফটের ১১, পুরানা পল্টন, ঢাকা। শনি, রবি ও সোমবার, সকাল ১০ টা হতে বিকাল ৫টা
+
+হবিগঞ্জ চেম্বার: 
+শ্মশান ঘাট, হবিগঞ্জ।  মঙ্গলবার বুধবার বৃহস্পতিবার সকাল দশটা হতে বিকাল পাঁচটা পর্যন্ত রোগী দেখা হয়। ‌
+
+Note: তোমাকে উপরে যে তথ্যগুলো এ কারণে দিলাম যাতে কোন ব্যক্তি যদি আমাদের পেইজে অথবা পার্সোনালি মেসেজ করে কোন প্রশ্ন করে অথবা কোন মন্তব্য করে ভালো হোক অথবা খারাপ অনেকে ভালো মন্তব্য করতে পারে খারাপ মন্তব্যও করতে পারে। সে ক্ষেত্রে তুমি খুব সুন্দর করে তাকে উত্তর দিতে পারো যাতে করে সে উত্তর সে দেখে খুশি হয় এবং সেটা যদি কমেন্ট বক্সে দিয়ে থাকে তার উত্তর অন্য কেউ দেখেও যাতে খুব আনন্দ পায় এবং আমাদের এখানে চিকিৎসা নিতে আগ্রহ দেখায়। এইজন্য তোমাকে এতগুলো তথ্য দিলাম। 
+
+নিচে তোমাকে একটি মেসেজ লিখে দিয়েছি যেটি আমাদের পেইজে একজন লোক মন্তব্য অথবা প্রশ্ন করে লিখেছেন তার এই মন্তব্য বা প্রশ্নের উত্তর তুমি সুন্দর করে লিখে দাও: \n\n"${userInput}" \n\n`;
+
+            document.getElementById('response').innerText = response;
+            document.getElementById('responseContainer').style.display = 'block';
+        }
+
+        function copyToClipboard() {
+            const responseText = document.getElementById('response').innerText;
+            navigator.clipboard.writeText(responseText).then(() => {
+                alert('Response copied to clipboard!');
+            }).catch(err => {
+                console.error('Failed to copy text: ', err);
+            });
+        }
+    </script>
+</body>
+</html>
