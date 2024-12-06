@@ -43,7 +43,11 @@
             border: none;
             cursor: pointer;
         }
-        button:hover {
+        button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+        button:hover:not(:disabled) {
             background-color: #2980b9;
         }
         textarea {
@@ -64,43 +68,92 @@
 
     <label for="appointmentPlace">স্থান:</label>
     <select id="appointmentPlace" required>
-        <option value="৫৬/১, বায়তুল ভিউ টাওয়ার, (বায়তুল মোকাররম উত্তর গেইটের বিপরীতে) লিফটের ১১, পুরানা পল্টন, ঢাকা। শনি, রবি ও সোমবার, সকাল ১০ টা হতে বিকাল ৫টা | https://maps.app.goo.gl/HhH5wwv6FEHDmMqP6">
-            ৫৬/১, বায়তুল ভিউ টাওয়ার, পুরানা পল্টন, ঢাকা।
-        </option>
-        <option value="শ্মশানঘাট, হবিগঞ্জ | https://maps.app.goo.gl/cLMhoUwAfudBDkwWA">
-            শ্মশানঘাট, হবিগঞ্জ
-        </option>
+        <option value="৫৬/১, বায়তুল ভিউ টাওয়ার, (বায়তুল মোকাররম উত্তর গেইটের বিপরীতে) লিফটের ১১, পুরানা পল্টন, ঢাকা। শনি, রবি ও সোমবার, সকাল ১০ টা হতে বিকাল ৫টা | Google Map : https://maps.app.goo.gl/HhH5wwv6FEHDmMqP6">৫৬/১, বায়তুল ভিউ টাওয়ার, পুরানা পল্টন, ঢাকা।</option>
+        <option value="শ্মশানঘাট, হবিগঞ্জ | Google Map: https://maps.app.goo.gl/cLMhoUwAfudBDkwWA">শ্মশানঘাট, হবিগঞ্জ।</option>
     </select>
 
     <label for="appointmentTime">সময়:</label>
-    <select id="appointmentTime" required>
-        <option value="সকাল ১০ টা">সকাল ১০ টা</option>
-        <option value="দুপুর ১২ টা">দুপুর ১২ টা</option>
-        <option value="বিকাল ৩ টা">বিকাল ৩ টা</option>
-        <option value="সন্ধ্যা ৫ টা">সন্ধ্যা ৫ টা</option>
+    <input type="time" id="appointmentTime" required>
+
+    <label for="phoneNumber">রোগীর ফোন নাম্বার:</label>
+    <input type="text" id="phoneNumber" placeholder="01XXXXXXXXX" maxlength="11" oninput="validatePhoneNumber()" required>
+
+    <label for="supportNumber">সাপোর্ট নাম্বার:</label>
+    <select id="supportNumber">
+        <option value="01617044121">01617044121</option>
+        <option value="01832233823">01832233823</option>
+        <option value="01633722707">01633722707</option>
     </select>
 
     <button onclick="generateMessage()">জেনারেট</button>
 
     <textarea id="outputMessage" readonly placeholder="এখানে মেসেজ প্রদর্শিত হবে..."></textarea>
+
     <button onclick="copyToClipboard()">কপি ক্লিপবোর্ড</button>
+    <button id="sendSmsButton" onclick="sendSMS()" disabled>Send SMS</button>
 </div>
 
 <script>
+    function validatePhoneNumber() {
+        const phoneInput = document.getElementById("phoneNumber");
+        const phoneValue = phoneInput.value;
+
+        // Remove non-numeric characters
+        phoneInput.value = phoneValue.replace(/[^0-9]/g, '');
+
+        // Check for length and starting pattern
+        if (phoneInput.value.length !== 11 || !phoneInput.value.startsWith("01")) {
+            phoneInput.style.borderColor = "red";
+        } else {
+            phoneInput.style.borderColor = "";
+        }
+    }
+
+    function convertDateToFormattedString(dateString) {
+        const days = ['রবিবার', 'সোমবার', 'মঙ্গলবার', 'বুধবার', 'বৃহস্পতিবার', 'শুক্রবার', 'শনিবার'];
+        const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+        const dateObj = new Date(dateString);
+        const dayName = days[dateObj.getDay()];
+        const day = String(dateObj.getDate()).padStart(2, '0');
+        const month = months[dateObj.getMonth()];
+        const year = dateObj.getFullYear();
+
+        return `${day}, ${month} ${year} (${dayName})`;
+    }
+
+    function convertTo12HourFormat(time) {
+        const [hour, minute] = time.split(":");
+        const hourInt = parseInt(hour, 10);
+        const period = hourInt >= 12 ? "PM" : "AM";
+        const hour12 = hourInt % 12 || 12; // Convert 24-hour to 12-hour format
+        return `${hour12}:${minute} ${period}`;
+    }
+
     function generateMessage() {
         const name = document.getElementById("patientName").value;
         const date = document.getElementById("appointmentDate").value;
         const place = document.getElementById("appointmentPlace").value;
         const time = document.getElementById("appointmentTime").value;
+        const phone = document.getElementById("phoneNumber").value;
+        const supportNumber = document.getElementById("supportNumber").value;
 
-        if (!name || !date || !place || !time) {
+        if (!name || !date || !place || !time || !phone) {
             alert("সব তথ্য পূরণ করুন।");
             return;
         }
 
-        const message = `প্রিয় ${name},\n\nআপনার সুবিধার্থে ডাঃ এস. এম. সরওয়ার স্যারের সাথে আপনার অ্যাপয়েন্টমেন্ট সফলভাবে বুক করা হয়েছে।\n\n• তারিখ: ${date}\n• সময়: ${time}\n• স্থান: ${place}\n\nআপনার নির্ধারিত সময়ে উপস্থিত থাকার জন্য অনুরোধ করা হলো। কোনো প্রকার সাহায্যের প্রয়োজন হলে এই নাম্বারে কল করুন: 01617044121 অথবা আমাদের ফেসবুক পেজে মেসেজ করুন।\n\nধন্যবাদান্তে,\nগণস্বাস্থ্য হোমিও\nযোগাযোগ: 01617044121`;
+        if (phone.length !== 11 || !phone.startsWith("01")) {
+            alert("সঠিক ফোন নাম্বার দিন (01XXXXXXXXX ফরম্যাট)।");
+            return;
+        }
+
+        const formattedDate = convertDateToFormattedString(date);
+        const formattedTime = convertTo12HourFormat(time);
+
+        const message = `প্রিয় ${name},\n\nআপনার সুবিধার্থে ডাঃ এস. এম. সরওয়ার স্যারের সাথে আপনার অ্যাপয়েন্টমেন্ট সফলভাবে বুক করা হয়েছে।\n\n• তারিখ: ${formattedDate}\n• সময়: ${formattedTime}\n• স্থান: ${place}\n\nআপনার নির্ধারিত সময়ে উপস্থিত থাকার জন্য অনুরোধ করা হলো।\n\nকোনো প্রকার সাহায্যের প্রয়োজন হলে এই নাম্বারে কল করুন: ${supportNumber} অথবা আমাদের ফেসবুক পেজে মেসেজ করুন।\n\nধন্যবাদান্তে,\nগণস্বাস্থ্য হোমিও\nযোগাযোগ: ${supportNumber}`;
 
         document.getElementById("outputMessage").value = message;
+        document.getElementById("sendSmsButton").disabled = false;
     }
 
     function copyToClipboard() {
@@ -110,6 +163,19 @@
         navigator.clipboard.writeText(outputMessage.value)
             .then(() => alert("মেসেজটি ক্লিপবোর্ডে কপি হয়েছে।"))
             .catch(err => alert("কপি করতে ব্যর্থ হয়েছে।"));
+    }
+
+    function sendSMS() {
+        const phoneNumber = document.getElementById("phoneNumber").value;
+        const message = document.getElementById("outputMessage").value;
+
+        if (!phoneNumber || !message) {
+            alert("মেসেজ পাঠানোর জন্য সমস্ত তথ্য পূরণ করুন।");
+            return;
+        }
+
+        const smsUrl = `sms:${phoneNumber}?body=${encodeURIComponent(message)}`;
+        window.location.href = smsUrl;
     }
 </script>
 
