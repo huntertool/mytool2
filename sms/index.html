@@ -80,11 +80,8 @@
 
     <label for="supportNumber">সাপোর্ট নাম্বার:</label>
     <select id="supportNumber">
-       
         <option value="01617044121">01617044121</option>
-        <option value="01633722707">01601071473</option> 
-       
-        
+        <option value="01601071473">01601071473</option> 
     </select>
 
     <button onclick="generateMessage()">জেনারেট</button>
@@ -100,10 +97,8 @@
         const phoneInput = document.getElementById("phoneNumber");
         const phoneValue = phoneInput.value;
 
-        // Remove non-numeric characters
         phoneInput.value = phoneValue.replace(/[^0-9]/g, '');
 
-        // Check for length and starting pattern
         if (phoneInput.value.length !== 11 || !phoneInput.value.startsWith("01")) {
             phoneInput.style.borderColor = "red";
         } else {
@@ -127,7 +122,7 @@
         const [hour, minute] = time.split(":");
         const hourInt = parseInt(hour, 10);
         const period = hourInt >= 12 ? "PM" : "AM";
-        const hour12 = hourInt % 12 || 12; // Convert 24-hour to 12-hour format
+        const hour12 = hourInt % 12 || 12;
         return `${hour12}:${minute} ${period}`;
     }
 
@@ -161,7 +156,7 @@
     function copyToClipboard() {
         const outputMessage = document.getElementById("outputMessage");
         outputMessage.select();
-        outputMessage.setSelectionRange(0, 99999); // For mobile devices
+        outputMessage.setSelectionRange(0, 99999);
         navigator.clipboard.writeText(outputMessage.value)
             .then(() => alert("মেসেজটি ক্লিপবোর্ডে কপি হয়েছে।"))
             .catch(err => alert("কপি করতে ব্যর্থ হয়েছে।"));
@@ -183,3 +178,4 @@
 
 </body>
 </html>
+
