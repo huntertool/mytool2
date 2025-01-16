@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dollar Purchase & Transfer Calculator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(to right, #6a11cb, #2575fc);
+      color: #fff;
+    }
+    .container {
+      max-width: 700px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #ffffff;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      color: #333;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #444;
+    }
+    label {
+      display: block;
+      margin: 10px 0 5px;
+      font-weight: bold;
+    }
+    input, select, button {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+    button {
+      background-color: #2575fc;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    .result {
+      margin-top: 20px;
+      padding: 15px;
+      border: 1px solid #ddd;
+      background-color: #f4f4f4;
+      border-radius: 5px;
+      color: #333;
+    }
+    p {
+      margin: 10px 0;
+      font-size: 16px;
+    }
+    .highlight {
+      font-weight: bold;
+      color: #2575fc;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Dollar Purchase & Transfer Calculator</h1>
+    <form id="dollarForm">
+      <label for="amount">Enter Dollar Amount:</label>
+      <input type="number" id="amount" placeholder="Amount in USD" required>
+
+      <label for="rate">Agent's Rate per Dollar (৳):</label>
+      <input type="number" id="rate" placeholder="Rate in BDT" required>
+
+      <label for="gateway">Select Payment Gateway:</label>
+      <select id="gateway" required>
+        <option value="bkash">Bkash (1.85%)</option>
+        <option value="nagad">Nagad (৳12.50 per 1000৳)</option>
+      </select>
+
+      <button type="button" id="calculateBtn">Calculate</button>
+    </form>
+
+    <div class="result" id="result"></div>
+  </div>
+
+  <script>
+    document.getElementById('calculateBtn').addEventListener('click', function() {
+      const amount = parseFloat(document.getElementById('amount').value);
+      const rate = parseFloat(document.getElementById('rate').value);
+      const gateway = document.getElementById('gateway').value;
+
+      if (isNaN(amount) || isNaN(rate) || !gateway) {
+        alert('Please fill all fields correctly.');
+        return;
+      }
+
+      // Binance Fee
+      const binanceFeeUSD = 0.05;
+      const adjustedAmount = amount + binanceFeeUSD;
+
+      // Total cost without Gateway Fee
+      const totalBDTWithoutGatewayFee = adjustedAmount * rate;
+
+      // Gateway Fee Calculation
+      let gatewayFee = 0;
+      if (gateway === 'bkash') {
+        gatewayFee = totalBDTWithoutGatewayFee * 0.0185;
+      } else if (gateway === 'nagad') {
+        gatewayFee = Math.ceil(totalBDTWithoutGatewayFee / 1000) * 12.5;
+      }
+
+      // Total cost including Gateway Fee
+      const totalBDTWithGatewayFee = totalBDTWithoutGatewayFee + gatewayFee;
+
+      // Net Rate per Dollar (without Gateway Fee)
+      const netRate = totalBDTWithoutGatewayFee / amount;
+
+      // RedotPay Transfer Calculation
+      const redotPayFee = adjustedAmount * 0.01; // 1% fee
+      const remainingUSD = adjustedAmount - redotPayFee;
+
+      // Final Summary
+      const totalSpentBDT = totalBDTWithGatewayFee;
+      const finalFeeBDT = gatewayFee + (binanceFeeUSD * rate) + (redotPayFee * rate);
+
+      document.getElementById('result').innerHTML = `
+        <p><strong>Total Cost (৳):</strong> <span class="highlight">${totalBDTWithGatewayFee.toFixed(2)}</span></p>
+        <p><strong>Cost Without Gateway Fee (৳):</strong> ${totalBDTWithoutGatewayFee.toFixed(2)}</p>
+        <p><strong>Binance Fee (৳):</strong> ${(binanceFeeUSD * rate).toFixed(2)}</p>
+        <p><strong>Payment Gateway Fee (৳):</strong> ${gatewayFee.toFixed(2)}</p>
+        <p><strong>Net Rate per Dollar (৳):</strong> ${netRate.toFixed(2)}</p>
+        <hr>
+        <p>If you transfer this balance to RedotPay:</p>
+        <p><strong>RedotPay Fee (USD):</strong> ${redotPayFee.toFixed(2)}</p>
+        <p><strong>Remaining USD after RedotPay Fee:</strong> <span class="highlight">${remainingUSD.toFixed(2)}</span> USD</p>
+        <hr>
+        <p>Final Summary:</p>
+        <p><strong>Total Spent (৳):</strong> <span class="highlight">${totalSpentBDT.toFixed(2)}</span></p>
+        <p><strong>Total Fee (৳):</strong> ${finalFeeBDT.toFixed(2)}</p>
+        <p><strong>Remaining USD after all fees:</strong> <span class="highlight">${remainingUSD.toFixed(2)}</span> USD</p>
+      `;
+    });
+  </script>
+</body>
+</html>
