@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>মেডিকেল বিল ক্যালকুলেটর</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        body {
+            background: #f0f2f5;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .calculator {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 500px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-size: 24px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #34495e;
+            font-weight: 500;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #bdc3c7;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        button:hover {
+            background: #2980b9;
+        }
+
+        .result {
+            margin-top: 25px;
+            padding: 20px;
+            background: #ecf0f1;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 18px;
+            color: #2c3e50;
+            display: none;
+        }
+        
+        .result div.highlight {
+            color: #27ae60;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        @media (max-width: 480px) {
+            .calculator {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <h1>মেডিকেল বিল ক্যালকুলেটর</h1>
+        
+        <div class="input-group">
+            <label>রোগী যত টাকা জমা দিয়েছে (৳)</label>
+            <input type="number" id="deposit" placeholder="জমা করা টাকার পরিমাণ লিখুন">
+        </div>
+
+        <div class="input-group">
+            <label>রোগীর জন্য মোট খরচ (৳)</label>
+            <input type="number" id="expenses" placeholder="মোট খরচের পরিমাণ লিখুন">
+        </div>
+
+        <div class="input-group">
+            <label>অবশিষ্ট টাকার ভাগ সংখ্যা</label>
+            <input type="number" id="parts" placeholder="ভাগের সংখ্যা লিখুন">
+        </div>
+
+        <button onclick="calculate()">ক্যালকুলেট করুন</button>
+
+        <div class="result" id="result"></div>
+    </div>
+
+    <script>
+        function calculate() {
+            // ইনপুট ভ্যালু সংগ্রহ
+            const deposit = parseFloat(document.getElementById('deposit').value);
+            const expenses = parseFloat(document.getElementById('expenses').value);
+            const parts = parseFloat(document.getElementById('parts').value);
+
+            // ভ্যালিডেশন চেক
+            if(isNaN(deposit) || isNaN(expenses) || isNaN(parts)) {
+                alert("দয়া করে সকল ফিল্ড সঠিকভাবে পূরণ করুন!");
+                return;
+            }
+
+            // মূল ক্যালকুলেশন
+            const halfDeposit = deposit / 2;
+            const remainingAfterExpenses = halfDeposit - expenses;
+            
+            if(remainingAfterExpenses < 0) {
+                document.getElementById('result').innerHTML = `
+                    <div style="color: #e74c3c;">
+                        সতর্কতা: খরচ জমা টাকার অর্ধেকের চেয়ে বেশি!
+                    </div>
+                `;
+                document.getElementById('result').style.display = 'block';
+                return;
+            }
+
+            const perPart = remainingAfterExpenses / parts;
+                const userAmount = remainingAfterExpenses - perPart;
+
+                // ফলাফল প্রদর্শন
+                const resultDiv = document.getElementById('result');
+                resultDiv.innerHTML = `
+                    <div>অবশিষ্ট টাকা: ৳${remainingAfterExpenses.toLocaleString('bn-BD')}</div>
+                    <div style="margin: 15px 0; font-size: 24px;">➔</div>
+                    <div>আপনি পাবেন: ৳${userAmount.toLocaleString('bn-BD')}</div>
+                    <div class="highlight">টিম মেম্বার পাবে: ৳${perPart.toLocaleString('bn-BD')}</div>
+                `;
+                resultDiv.style.display = 'block';
+            }
+
+        // Enter key এ ক্যালকুলেশন
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('keypress', function(e) {
+                if(e.key === 'Enter') calculate();
+            });
+        });
+    </script>
+</body>
+</html>
