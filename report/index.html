@@ -48,16 +48,115 @@
             background-color: #0056b3;
         }
 
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+
         #result {
             margin-top: 20px;
             display: none;
         }
+
+        #passwordContainer {
+            display: block;
+        }
+
+        #mainContent {
+            display: none;
+        }
+
+        #passwordInput {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        
+        .attempts-warning {
+            color: #ff9800;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        
+        .locked-message {
+            color: #f44336;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        /* নতুন স্টাইল যোগ করা হয়েছে */
+        .input-group {
+            margin: 15px 0;
+            text-align: left;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        select {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        
+        .optional-text {
+            font-size: 12px;
+            color: #666;
+            margin-top: -8px;
+            margin-bottom: 10px;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>রিপোর্টের লেখা সাবমিট করুন</h1>
-        <textarea id="reportInput" placeholder="রোগীর রিপোর্ট এখানে পেস্ট করুন..."></textarea>
+    <div class="container" id="passwordContainer">
+        <h1>পাসওয়ার্ড দিন</h1>
+        <input type="password" id="passwordInput" placeholder="পাসওয়ার্ড লিখুন">
+        <button id="loginButton">লগইন</button>
+        <p id="errorMessage" style="color: red; display: none;">ভুল পাসওয়ার্ড! আবার চেষ্টা করুন</p>
+        <p id="attemptsWarning" class="attempts-warning" style="display: none;"></p>
+        <p id="lockedMessage" class="locked-message" style="display: none;"></p>
+    </div>
+
+    <div class="container" id="mainContent">
+        <h1>রিপোর্টের তথ্য প্রদান করুন</h1>
+        
+        <div class="input-group">
+            <label for="reporterRelation">রিপোর্ট যিনি পাঠিয়েছেন:</label>
+            <select id="reporterRelation">
+                <option value="রোগী নিজে">রোগী নিজে</option>
+                <option value="রোগীর ছেলে অথবা মেয়ে">রোগীর ছেলে অথবা মেয়ে</option>
+                <option value="রোগীর পরিবারের কেউ">রোগীর পরিবারের কেউ</option>
+                <option value="রোগীর কোন আত্মীয়">রোগীর কোন আত্মীয়</option>
+            </select>
+        </div>
+
+        <div class="input-group">
+            <label for="reportedDisease">কোন রোগের কথা জানিয়েছে:</label>
+            <textarea id="reportedDisease" placeholder="রোগী যে লক্ষণগুলো জানিয়েছে তা লিখুন..." rows="2"></textarea>
+            <div class="optional-text">(এটি ঐচ্ছিক, না দিলে রিপোর্ট অনুযায়ী বিবেচনা করা হবে)</div>
+        </div>
+
+        <div class="input-group">
+            <label for="medicalHistory">পূর্বের কোন ইতিহাস:</label>
+            <textarea id="medicalHistory" placeholder="পূর্বের চিকিৎসা বা অপারেশনের ইতিহাস লিখুন..." rows="2"></textarea>
+            <div class="optional-text">(এটি ঐচ্ছিক, না দিলে উল্লেখ করা হবে না)</div>
+        </div>
+
+        <div class="input-group">
+            <label for="reportInput">রোগীর রিপোর্ট:</label>
+            <textarea id="reportInput" placeholder="রোগীর রিপোর্ট এখানে পেস্ট করুন..." rows="5"></textarea>
+        </div>
+
         <button id="generatePrompt">Submit</button>
         <div id="result">
             <h2>জেনারেটেড প্রম্পট:</h2>
@@ -67,10 +166,135 @@
     </div>
 
     <script>
+        // Enhanced Password Protection
+        const passwordContainer = document.getElementById("passwordContainer");
+        const mainContent = document.getElementById("mainContent");
+        const passwordInput = document.getElementById("passwordInput");
+        const loginButton = document.getElementById("loginButton");
+        const errorMessage = document.getElementById("errorMessage");
+        const attemptsWarning = document.getElementById("attemptsWarning");
+        const lockedMessage = document.getElementById("lockedMessage");
+
+        // Configuration
+        const MAX_ATTEMPTS = 5;
+        const LOCK_TIME_MINUTES = 15;
+        const SESSION_TIMEOUT_HOURS = 2;
+        
+        // Hashed password (SHA-256 hash of "mashunterbd")
+        const PASSWORD_HASH = "605613a812a47a0029417b4c5c655c3b2a28da2dd101665c85013a3b96d7487c";
+
+        // Check if user is already authenticated
+        function checkAuth() {
+            const authData = localStorage.getItem("authData");
+            if (authData) {
+                const { timestamp, hash } = JSON.parse(authData);
+                const currentTime = new Date().getTime();
+                const elapsedHours = (currentTime - timestamp) / (1000 * 60 * 60);
+                
+                if (elapsedHours < SESSION_TIMEOUT_HOURS && hash === PASSWORD_HASH) {
+                    passwordContainer.style.display = "none";
+                    mainContent.style.display = "block";
+                    return true;
+                } else {
+                    localStorage.removeItem("authData");
+                }
+            }
+            return false;
+        }
+
+        // Initialize
+        if (!checkAuth()) {
+            // Check if user is locked out
+            const lockData = localStorage.getItem("lockData");
+            if (lockData) {
+                const { timestamp } = JSON.parse(lockData);
+                const currentTime = new Date().getTime();
+                const elapsedMinutes = (currentTime - timestamp) / (1000 * 60);
+                
+                if (elapsedMinutes < LOCK_TIME_MINUTES) {
+                    const remainingMinutes = Math.ceil(LOCK_TIME_MINUTES - elapsedMinutes);
+                    passwordInput.disabled = true;
+                    loginButton.disabled = true;
+                    lockedMessage.textContent = `অ্যাকাউন্ট লক করা হয়েছে। ${remainingMinutes} মিনিট পর আবার চেষ্টা করুন।`;
+                    lockedMessage.style.display = "block";
+                } else {
+                    localStorage.removeItem("lockData");
+                }
+            }
+        }
+
+        // SHA-256 hashing function
+        async function sha256(message) {
+            const msgBuffer = new TextEncoder().encode(message);                    
+            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+            return hashHex;
+        }
+
+        // Login button event
+        loginButton.addEventListener("click", async () => {
+            const password = passwordInput.value;
+            if (!password) return;
+            
+            let attempts = parseInt(localStorage.getItem("loginAttempts")) || 0;
+            
+            if (attempts >= MAX_ATTEMPTS) {
+                localStorage.setItem("lockData", JSON.stringify({ timestamp: new Date().getTime() }));
+                passwordInput.disabled = true;
+                loginButton.disabled = true;
+                lockedMessage.textContent = `অ্যাকাউন্ট লক করা হয়েছে। ${LOCK_TIME_MINUTES} মিনিট পর আবার চেষ্টা করুন।`;
+                lockedMessage.style.display = "block";
+                errorMessage.style.display = "none";
+                attemptsWarning.style.display = "none";
+                return;
+            }
+            
+            const inputHash = await sha256(password);
+            
+            if (inputHash === PASSWORD_HASH) {
+                localStorage.setItem("authData", JSON.stringify({ hash: PASSWORD_HASH, timestamp: new Date().getTime() }));
+                localStorage.removeItem("loginAttempts");
+                passwordContainer.style.display = "none";
+                mainContent.style.display = "block";
+            } else {
+                attempts++;
+                localStorage.setItem("loginAttempts", attempts.toString());
+                
+                errorMessage.style.display = "block";
+                passwordInput.value = "";
+                
+                if (MAX_ATTEMPTS - attempts > 0) {
+                    attemptsWarning.textContent = `আপনার ${MAX_ATTEMPTS - attempts} বার চেষ্টা বাকি আছে`;
+                    attemptsWarning.style.display = "block";
+                } else {
+                    attemptsWarning.textContent = "একটি ভুল চেষ্টা বাকি আছে!";
+                    attemptsWarning.style.display = "block";
+                }
+                
+                if (attempts >= MAX_ATTEMPTS) {
+                    localStorage.setItem("lockData", JSON.stringify({ timestamp: new Date().getTime() }));
+                    passwordInput.disabled = true;
+                    loginButton.disabled = true;
+                    lockedMessage.textContent = `অ্যাকাউন্ট লক করা হয়েছে। ${LOCK_TIME_MINUTES} মিনিট পর আবার চেষ্টা করুন।`;
+                    lockedMessage.style.display = "block";
+                }
+            }
+        });
+
+        passwordInput.addEventListener("keyup", (event) => {
+            if (event.key === "Enter") loginButton.click();
+        });
+
+        // Generate Prompt Functionality
         document.getElementById('generatePrompt').addEventListener('click', () => {
+            // Collect all inputs
+            const reporterRelation = document.getElementById('reporterRelation').value;
+            const reportedDisease = document.getElementById('reportedDisease').value || 'উল্লেখ করা হয়নি';
+            const medicalHistory = document.getElementById('medicalHistory').value || 'উল্লেখ করা হয়নি';
             const inputText = document.getElementById('reportInput').value;
 
-            // Remove unnecessary empty lines
+            // Process report text
             const cleanedText = inputText
                 .split('\n')
                 .map(line => line.trim())
@@ -78,23 +302,54 @@
                 .join('\n');
 
             // Generate prompt
-            const prompt = `আমাদের একটি ফেসবুক পেজ রয়েছে পেজটির নাম "Dr SM Sarwer" এটি মূলত গণসাস্থ্য হোমিও কোম্পানির অন্তর্গত একটি ফেসবুক পেজ। এই কোম্পানির প্রধান ডাক্তার হচ্ছে ডক্টর এস এম সারওয়ার তিনি হচ্ছেন একজন ক্যান্সার স্পেশালিস্ট এবং তার ৩০ বছরের অভিজ্ঞতা। আমাদের চেম্বারে রোগী আনার জন্য আমরা বিভিন্ন রোগীর সুস্থ হয়ে যাওয়ার পর তাদের সাক্ষাৎকারের ভিডিও সুন্দর করে এডিট করে সেগুলো আমরা ফেসবুকে নির্দিষ্ট কোন পেইজে ছেড়ে সেটাকে আমরা বুস্ট করে দিই যাতে সারা দেশের লোক দেখে আমাদের চিকিৎসা নিতে আসো। তো সেরকমই boost ভিডিও দেখে কোন কোন রোগী আমাদেরকে মেসেজ দেয় , তার অথবা তাদের সমস্যা নিয়ে। এখন সেই রোগী দুই একটা কথা বলার পর তাদের যে সমস্যাটি তার কিছু রিপোর্ট পাঠিয়েছে! যে জীবন গুলো মূলত ছবি সেই ছবিগুলোর মধ্যে থেকে আমি লেখাগুলো আলাদা করে তোমাকে পাঠাচ্ছি। অনেক সময় ছবি আঁকাবাঁকা হওয়ার কারণে অনেক লেখা সঠিক ভাবে  copy হয় না,অনের ক্ষেত্রে শব্দের বানান ভুল দেখা যায়। তবে এরকম কিছু হলে তুমি সেটা নিজে নিজে বুঝে নিও তুমি তোমার বুদ্ধির ব্যবহার করে। 
+            const prompt = `রিপোর্ট প্রেরক: ${reporterRelation}
+রোগীর অভিযোগ: ${reportedDisease}
+পূর্বের ইতিহাস: ${medicalHistory}
 
-ক্যান্সার বিশেষজ্ঞ অধ্যক্ষ ডাঃ এস এম সরওয়ার স্যার যে কোন ক্যান্সারের চিকিৎসা করে থাকেন। তিনি রোগী দেখেন ঢাকা এবং হবিগঞ্জ। মেসেজ এবং কল দিয়ে বিস্তারিত জেনে নিন। সিরিয়ালের জন্য যোগাযোগ করুন | 01617044121 এই নাম্বারে অথবা মেসেজ করুন আমাদের পেইজে। তিনি যেসব রোগের চিকিৎসা করেন: নিচে দেওয়া রোগ গুলোর চিকিৎসা করা হয় আমাদের হোমিও সেন্টারে। 
+আমাদের একটি ফেসবুক পেজ রয়েছে পেজটির নাম "Dr SM Sarwer" এটি মূলত গণসাস্থ্য হোমিও কোম্পানির অন্তর্গত একটি ফেসবুক পেজ। এই কোম্পানির প্রধান ডাক্তার হচ্ছে ডক্টর এস এম সারওয়ার তিনি হচ্ছেন একজন ক্যান্সার স্পেশালিস্ট এবং তার ৩০ বছরের অভিজ্ঞতা। আমাদের চেম্বারে রোগী আনার জন্য আমরা বিভিন্ন রোগীর সুস্থ হয়ে যাওয়ার পর তাদের সাক্ষাৎকারের ভিডিও সুন্দর করে এডিট করে সেগুলো আমরা ফেসবুকে নির্দিষ্ট কোন পেইজে ছেড়ে সেটাকে আমরা বুস্ট করে দিই যাতে সারা দেশের লোক দেখে আমাদের চিকিৎসা নিতে আসো। তো সেরকমই boost ভিডিও দেখে কোন কোন রোগী আমাদেরকে মেসেজ দেয় , তার অথবা তাদের সমস্যা নিয়ে। এখন সেই রোগী দুই একটা কথা বলার পর তাদের যে সমস্যাটি তার কিছু রিপোর্ট পাঠিয়েছে! যে জীবন গুলো মূলত ছবি সেই ছবিগুলোর মধ্যে থেকে আমি লেখাগুলো আলাদা করে তোমাকে পাঠাচ্ছি। অনেক সময় ছবি আঁকাবাঁকা হওয়ার কারণে অনেক লেখা সঠিক ভাবে  copy হয় না,অনের ক্ষেত্রে শব্দের বানান ভুল দেখা যায়। তবে এরকম কিছু হলে তুমি সেটা নিজে নিজে বুঝে নিও তুমি তোমার বুদ্ধির ব্যবহার করে। 
 
-ক্যান্সার, ব্লাড ক্যান্সার, থ্যালাসেমিয়া, কিডনী, প্যারালাইসিস, অচল, শিশু ও বৃদ্ধ হাড় বাঁকা, হাড় নরম, হাড় চিকন, টিউমার, প্রস্রাবের রাস্তায় পাথর, পিত্তে পাথর, ব্লাড প্রেসার, স্মৃতি শক্তি হ্রাস, চক্ষুরোগ, পলিপাশ, সাইনোসাইটিস, হার্নিয়া পীড়া, হার্ট দুর্বলতা, লিভারের পীড়া, রক্তস্রাব, একশিরা, ডায়াবেটিস, বহুমূত্র, বাত ব্যাথা, বিষাক্ত ফোঁড়া, ব্রণ, স্থনের পীড়া, জরায়ুর পীড়া, শ্বাস কষ্ট, হাঁপানী, দন্তের পীড়া, দাউদ, দলফিসকি, গায়ের চামড়া মোমের মত সাদা, ধনুষ্টংকার, যৌন পীড়া, ধ্বজভঙ্গ, কানের পীড়া, নাকের পীড়া, গ্যাস্ট্রিক, পেটের পীড়া, চর্মরোগ, পুঁজ, স্রাব, প্রসব বেদনা, ফুসফুসের পীড়া, সুতিকা মেয়েদের সাদা স্রাব, স্ত্রীরোগ, স্বপ্নদোষ, হাঁচি, হাম, যক্ষা, হৃদরোগ, অর্শ্ব, পাইলস, গেজ ইত্যাদি পুরাতন কঠিন ও জঠিল রোগের চিকৎসা করা হয়। ক্যান্সার বিশেষজ্ঞ অধ্যক্ষ ডাঃ এস এম সরওয়ার স্যার যে কোন ক্যান্সারের চিকিৎসা করে থাকেন। তিনি রোগী দেখেন ঢাকা এবং হবিগঞ্জ। মেসেজ এবং কল দিয়ে বিস্তারিত জেনে নিন। সিরিয়ালের জন্য যোগাযোগ করুন | 01617044121 এই নাম্বারে অথবা মেসেজ করুন আমাদের পেইজে। তিনি যেসব রোগের চিকিৎসা করেন: নিচে দেওয়া রোগ গুলোর চিকিৎসা করা হয় আমাদের হোমিও সেন্টারে। 
+ক্যান্সার বিশেষজ্ঞ অধ্যক্ষ ডাঃ এস এম সরওয়ার স্যার যে কোন ক্যান্সারের চিকিৎসা করে থাকেন। তিনি রোগী দেখেন ঢাকা এবং হবিগঞ্জ। মেসেজ এবং কল দিয়ে বিস্তারিত জেনে নিন। সিরিয়ালের জন্য যোগাযোগ করুন | 01624-352376 এই নাম্বারে অথবা মেসেজ করুন আমাদের পেইজে। তিনি যেসব রোগের চিকিৎসা করেন: নিচে দেওয়া রোগ গুলোর চিকিৎসা করা হয় আমাদের হোমিও সেন্টারে। 
+
+ক্যান্সার, ব্লাড ক্যান্সার, থ্যালাসেমিয়া, কিডনী, প্যারালাইসিস, অচল, শিশু ও বৃদ্ধ হাড় বাঁকা, হাড় নরম, হাড় চিকন, টিউমার, প্রস্রাবের রাস্তায় পাথর, পিত্তে পাথর, ব্লাড প্রেসার, স্মৃতি শক্তি হ্রাস, চক্ষুরোগ, পলিপাশ, সাইনোসাইটিস, হার্নিয়া পীড়া, হার্ট দুর্বলতা, লিভারের পীড়া, রক্তস্রাব, একশিরা, ডায়াবেটিস, বহুমূত্র, বাত ব্যাথা, বিষাক্ত ফোঁড়া, ব্রণ, স্থনের পীড়া, জরায়ুর পীড়া, শ্বাস কষ্ট, হাঁপানী, দন্তের পীড়া, দাউদ, দলফিসকি, গায়ের চামড়া মোমের মত সাদা, ধনুষ্টংকার, যৌন পীড়া, ধ্বজভঙ্গ, কানের পীড়া, নাকের পীড়া, গ্যাস্ট্রিক, পেটের পীড়া, চর্মরোগ, পুঁজ, স্রাব, প্রসব বেদনা, ফুসফুসের পীড়া, সুতিকা মেয়েদের সাদা স্রাব, স্ত্রীরোগ, স্বপ্নদোষ, হাঁচি, হাম, যক্ষা, হৃদরোগ, অর্শ্ব, পাইলস, গেজ ইত্যাদি পুরাতন কঠিন ও জঠিল রোগের চিকৎসা করা হয়। ক্যান্সার বিশেষজ্ঞ অধ্যক্ষ ডাঃ এস এম সরওয়ার স্যার যে কোন ক্যান্সারের চিকিৎসা করে থাকেন। তিনি রোগী দেখেন ঢাকা এবং হবিগঞ্জ। মেসেজ এবং কল দিয়ে বিস্তারিত জেনে নিন। সিরিয়ালের জন্য যোগাযোগ করুন | 01624-352376 এই নাম্বারে অথবা মেসেজ করুন আমাদের পেইজে। তিনি যেসব রোগের চিকিৎসা করেন: নিচে দেওয়া রোগ গুলোর চিকিৎসা করা হয় আমাদের হোমিও সেন্টারে। 
 
 রোগীর রিপোর্ট সবগুলো মধ্যে থেকে স্ক্যান করে শুধুমাত্র লেখাগুলো বের করার পরে যা পেলাম সেগুলো নিম্নে দেওয়া হলো: 
 ${cleanedText}
 
-এখন সম্পূর্ণ রিপোর্টটি তুমি দেখে কি বুঝতে পারলে রোগীর কি রোগ হয়েছে এবং কি কি সমস্যা রয়েছে সেগুলো আমাকে বল। এখন রিপোর্টগুলো তুমি এনালাইসিস করে দেখার পর রুগীর যে খারাপ দিকগুলো রিপোর্টের মধ্যে আছে সেগুলো উল্লেখ করে আমাদের গণস্বাস্থ্য হোমিও থেকে উনি চিকিৎসা নিয়ে সুস্থতার জীবন-যাপন করতে পারে তার আশ্বাসসহ লিখে রিপ্লে মেসেজ লিখে দাও , যে রিপ্লাই মেসেজটা আমরা রোগীকে দিলে সে খুবই ভরসা পাবে এবং আমাদের এখানে এসে চিকিৎসা নেওয়ার জন্য আগ্রহ দেখাতে পারে। এবং সেই রোগ সম্পর্কিত কিছু প্রশ্ন যেগুলো আমরা তাকে করতে পারি সেগুলো নিচে লিখে দিবে এবং ঠিক কেমন উত্তর হলে এর পরবর্তীতে কি প্রশ্ন করতে পারি সেটাও লিখে দিও। `;
+এখন সম্পূর্ণ রিপোর্টটি তুমি দেখে কি বুঝতে পারলে রোগীর কি রোগ হয়েছে এবং কি কি সমস্যা রয়েছে সেগুলো আমাকে বল। এখন রিপোর্টগুলো তুমি এনালাইসিস করে দেখার পর রুগীর যে খারাপ দিকগুলো রিপোর্টের মধ্যে আছে সেগুলো উল্লেখ করে আমাদের গণস্বাস্থ্য হোমিও থেকে উনি চিকিৎসা নিয়ে সুস্থতার জীবন-যাপন করতে পারে তার আশ্বাসসহ লিখে রিপ্লে মেসেজ লিখে দাও , যে রিপ্লাই মেসেজটা আমরা রোগীকে দিলে সে খুবই ভরসা পাবে এবং আমাদের এখানে এসে চিকিৎসা নেওয়ার জন্য আগ্রহ দেখাতে পারে। এবং সেই রোগ সম্পর্কিত কিছু প্রশ্ন যেগুলো আমরা তাকে করতে পারি সেগুলো নিচে লিখে দিবে এবং ঠিক কেমন উত্তর হলে এর পরবর্তীতে কি প্রশ্ন করতে পারি সেটাও লিখে দিও। রিপোর্ট এনালাইসিস করার পর সবার নিচে তুমি এই ফরমেটে লিখে দিবে: 
+নাম : (রিপোর্টের মধ্যে রোগীর যা নাম ছিল সেটি)
+ঠিকানা : (অনেক সময় রিপোর্টের উপরে যে হসপিটালের নাম লেখা থাকে অবশ্যই হসপিটাল কোন ঠিকানায় অথবা যেখান থেকে টেস্ট করেছে সেটি কোন ঠিকানায় ওই ঠিকানাটি লিখে দিবে, অথবা সবার হেডিং এর উপরে যদি ঠিকানা না থাকে সেই ক্ষেত্রে ডাক্তারের সিগনেচার এর নিচে অনেক সময় ঠিকানা দেওয়া থাকে সেটাকে ধরে নিবে রোগীর ঠিকানা, কেননা যে কোন রোগী কোন মেডিকেল টেস্ট অথবা ডাক্তার দেখাতে গেলে আগে এসে যেখানে থাকে যে এলাকায় সেই এলাকার আশেপাশে কোথাও দেখাবে সে ক্ষেত্রে আমরা ওই ঠিকানা ঠিকই সনাক্ত করব)
+রিপোর্ট থেকে যদি তুমি সিলেটের নিম্ন দেওয়া ঠিকানা গুলি পাও : সিলেট বিভাগের জেলা সমূহ
+১। সিলেট জেলা  -   সুরমা, কুশিয়ারা ।
 
-            // Display result
+২। হবিগঞ্জ জেলা - কুশিয়ারা, খোয়াই, সুতাং, রত্না, শুটকী, সোনাই, করাঙ্গী, ঝিংড়ী, ভেড়ামোহনা, বরাক, বিজনা প্রভৃতি।
+
+৩। সুনামগঞ্জ জেলা -  সুরমা, কুশিয়ারা, কালনী, চলতি, যাদুকাটা, রক্তি, মরাচেলা, খাসিয়ামারা, বৌলাই,পাটলাই, দাড়াইন, কংস ইত্যাদি।
+
+৪। মৌলভীবাজার জেলা - মনু নদী (মৌলভীবাজার সদর), ধলাই নদী (কমলগঞ্জ), ফানাই নদী (কুলাউড়া), জুড়ী নদী (জুড়ী), কন্ঠিনালা নদী(জুড়ী)। সেই ক্ষেত্রে যেভাবে লিখে দিবে আমি নিচে লিখে দিচ্ছি: 
+নাম: (রিপোর্ট অনুযায়ী বসবে)
+ঠিকানা: (রিপোর্ট অনুযায়ী বসবে)
+মঙ্গলবার, ১৫ই এপ্রিল।
+---------------------------------
+নাম: (রিপোর্ট অনুযায়ী বসবে)
+ঠিকানা: (রিপোর্ট অনুযায়ী বসবে)
+বুধবার, ১৬ই এপ্রিল।
+---------------------------------
+নাম: (রিপোর্ট অনুযায়ী বসবে)
+ঠিকানা: (রিপোর্ট অনুযায়ী বসবে)
+বৃহস্পতিবার, ১৭ই এপ্রিল।
+note: আমি যে তারিখ দিয়েছি ১৫ এপ্রিল ১৬ এপ্রিল 17 এপ্রিল এটা আমি তোমাকে বোঝানোর জন্য দিয়েছি, এখানে তুমি ওইদিনের তারিখটায় দিবে যেদিন তোমাকে আমি রিপোর্ট এনালাইসিস করতে দিয়েছি সেই দিনের মধ্যে যেদিন এর তারিখের মধ্যে মঙ্গলবার বুধবার বৃহস্পতিবার হবে ওইটা। যদি রিপোর্ট অনুযায়ী পেশেন্টের ঠিকানা সিলেটের মধ্যে হয়ে থাকে। আর যদি সিলেট বিভাগের বাহিরে অন্য কোথাও ঠিকানা হয়ে থাকে সেই ক্ষেত্রে নাম রিপোর্ট অনুযায়ী থাকবে এবং ঠিকানা রিপোর্ট অনুযায়ী থাকবে আর রোগী আসার দিন এবং তারিখের ক্ষেত্রে শনিবার রবিবার সোমবার এই তিন দিনের লিখে দিতে হবে এবং রিপোর্ট এনালাইসিস করছি যেদিন ওই সপ্তাহের মধ্যে ওই তারিখ বসিয়ে দিবে, আশা করি তুমি তোমার বুদ্ধি মাত্রা এটা বুঝতে পেরেছ। আরেকটি বিষয় জানিয়ে রাখি আমাদের চেম্বার হচ্ছে দুটি ঢাকা চেম্বারে রোগী দেখা হয় শনিবার রবিবার সোমবার এবং সিলেট হবিগঞ্জ চেম্বারে রোগী দেখা হয় মঙ্গলবার বুধবার বৃহস্পতিবার ,শুক্রবার বন্ধ থাকে। ‌ যেকোনো একজন ব্যক্তির সিরিয়াল লিখলে ঢাকার হলে তিন দিনের সিরিয়াল লিখে দিবে এবং সিলেটের হলেও তিনদিনের। 
+
+রোগীর রিপোর্ট বিশ্লেষণ:
+${cleanedText}
+
+`;
+
+            // Show result
             document.getElementById('result').style.display = 'block';
             document.getElementById('promptOutput').value = prompt;
         });
 
-        // Copy to clipboard functionality
+        // Copy functionality
         document.getElementById('copyClipboard').addEventListener('click', () => {
             const promptOutput = document.getElementById('promptOutput');
             promptOutput.select();
