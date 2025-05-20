@@ -32,6 +32,7 @@
             <button class="list-group-item list-group-item-action" onclick="showForm('newsPrompt')">News Promot</button>
             <button class="list-group-item list-group-item-action" onclick="showForm('titlePrompt')">Title Promot</button>
             <button class="list-group-item list-group-item-action" onclick="showForm('tagPrompt')">FB, YT, INS Tag Promot</button>
+            <button class="list-group-item list-group-item-action" onclick="showForm('livePrompt')">Live Promote</button>
         </div>
 
         <!-- News Prompt Form -->
@@ -80,6 +81,16 @@
             <button class="btn btn-primary" onclick="generateTags()">Generate</button>
             <div id="generatedTagOutput"></div>
         </div>
+
+        <!-- Live Promote Form -->
+        <div id="livePrompt" class="form-container">
+            <h2>Live Promote</h2>
+            <label for="liveInfo">লাইভ শো-এর তথ্য লিখুন:</label>
+            <textarea id="liveInfo" class="form-control" rows="4"></textarea>
+            <br>
+            <button class="btn btn-primary" onclick="generateLive()">Generate</button>
+            <div id="generatedLiveOutput"></div>
+        </div>
     </div>
 
     <script>
@@ -92,7 +103,7 @@
 
         function copyToClipboard(text, outputElement) {
             navigator.clipboard.writeText(text).then(() => {
-                outputElement.innerHTML = `<p>${text}</p><button class="btn btn-secondary mt-2" onclick="copyToClipboard('${text}', this.parentNode)">Copy</button>`;
+                outputElement.innerHTML = `<p>${text}</p><button class="btn btn-secondary mt-2" onclick="copyToClipboard('${text.replace(/'/g, "\\'")}', this.parentNode)">Copy</button>`;
             });
         }
 
@@ -130,6 +141,25 @@
             }
             const text = `Based on the above, create some hash tags (#) that match our title report, and hash tags that have top ranking and viral ranking like On Social Media. Our YouTube channel is called ${pageName}, and this is a ${category} channel, so news-related hashtags should be generated. The hashtags will include languages: ${languages.join(", ")}.\n\nTopic: ${topic}\nPage Name: ${pageName}\nCategory: ${category}`;
             copyToClipboard(text, document.getElementById("generatedTagOutput"));
+        }
+
+        function generateLive() {
+            const liveInfo = document.getElementById("liveInfo").value;
+            if (!liveInfo) {
+                alert("Please provide live show details.");
+                return;
+            }
+            const text = `Live Promote
+
+নিচে আমি তোমাকে কিছু তথ্য দিচ্ছি সেই তথ্যের ভিত্তিতে আমরা এখন একটি লাইভ শো করব। যেমন সেটা হতে পারে কোন সমাবেশ অথবা কোন মিছিল অথবা কোন প্রোগ্রাম অথবা কোন অনুষ্ঠান অথবা হতে পারে কোন কনফারেন্স হতে পারে মারামারি হতে পারে বিচারের সভা — যে কোন কিছুরই হতে পারে। তুমি অবশ্যই নিচে দেওয়া প্রজ্ঞাপন বা আমাদের দেওয়া তথ্য অনুযায়ী বুঝে নেবে।
+
+এবং লাইভ শো এর মধ্যে যে কথাগুলো বলতে হবে সেগুলো বর্তমানে চলছে এমন কথা হতে হবে কারণ যেহেতু এটা একটি লাইভ শো সুতরাং এখানে অতীত বা পূর্বের কোন ঘটনা থাকবে না, সবকিছুই থাকবে বর্তমান। প্রথমে লিখে দিবে শিরোনাম বা হেডলাইন তারপর লিখে দিবে বিস্তারিত।
+
+তোমাকে সেই শো এর ভিত্তিতে যদি কোন ইনফরমেশন দেই সেখানে যদি পর্যাপ্ত ইনফরমেশন না থাকে তাহলে বাকি ইনফরমেশন গুলো আমাদের দেওয়া তথ্য অনুযায়ী ইন্টারনেটে অনুসন্ধানের মাধ্যমে বের করে নিয়ে আসবে। হতে পারে আমাদের তথ্য অর্ধেক রয়েছে, আর যত পারো বেশি তথ্য দিতে হবে অনলাইন থেকে সংগ্রহ করে। অবশ্যই তথ্যগুলো নেওয়ার পূর্বে যাচাই করবে যে আমাদের দেওয়া তথ্য অনুযায়ী সেটা মিল আছে কিনা, অন্য কোন শো বা ভুল কোন সমাবেশের তথ্য সংযুক্ত করা যাবে না। একদম আসল এবং অথেন্টিক তথ্য দিতে হবে, ঘটনার প্রেক্ষাপটে। শুদ্ধ ভাষায় সাংবাদিক সুলভ বাক্য ব্যবহার করতে হবে। কোন আঞ্চলিক বা সাধু ভাষা নয়। সবশেষে নির্দিষ্ট যে লাইভ শো এর তথ্য দেওয়া হবে অথবা অনলাইন থেকে তুমি যে তথ্য পাও সেই তথ্য অনুযায়ী যদি কেউ বক্তব্য দেয় বক্তব্য চলাকালীন তাকে যদি কোন সাংবাদিক প্রশ্ন করতে চায় তাহলে কি নিয়ে প্রশ্ন করতে পারে সেরকম কিছু প্রশ্ন নিচে লিখে দিবে। যে প্রশ্নগুলোই করবে সে প্রশ্ন কিন্তু উক্ত অনুষ্ঠান বা মিছিল বা সমাবেশের সাথে সামঞ্জস্যতা থাকতে হবে এবং মানুষ জানতে চায় বা সারাদেশের জনতা এ ব্যাপারে জানতে চায় সেরকম প্রশ্ন হতে হবে উল্টাপাল্টা প্রশ্ন দিলে কিন্তু হবে না। বাস্তবসম্মত এবং মানুষের চাহিদা সময় হতো প্রশ্ন হতে হবে। আশা করি তুমি তোমার বুদ্ধিমাত্রায় বিষয়টি বুঝতে পেরেছ।
+
+প্রাপ্ত তথ্য:
+${liveInfo}`;
+            copyToClipboard(text, document.getElementById("generatedLiveOutput"));
         }
     </script>
 </body>
