@@ -32,7 +32,10 @@
             <button class="list-group-item list-group-item-action" onclick="showForm('newsPrompt')">News Promot</button>
             <button class="list-group-item list-group-item-action" onclick="showForm('titlePrompt')">Title Promot</button>
             <button class="list-group-item list-group-item-action" onclick="showForm('tagPrompt')">FB, YT, INS Tag Promot</button>
-            <button class="list-group-item list-group-item-action" onclick="showForm('livePrompt')">Live Promote</button>
+            <button class="list-group-item list-group-item-action" onclick="showForm('livePrompt')">Live Promote</button> 
+            <button class="list-group-item list-group-item-action" onclick="showForm('reelsPrompt')">Reels and Title Tag Maker</button>
+
+
         </div>
 
         <!-- News Prompt Form -->
@@ -81,6 +84,18 @@
             <button class="btn btn-primary" onclick="generateTags()">Generate</button>
             <div id="generatedTagOutput"></div>
         </div>
+        
+                
+                <!-- Reels and Title Tag Maker Form -->
+            <div id="reelsPrompt" class="form-container">
+            <h2>Reels and Title Tag Maker</h2>
+            <label for="reelsDetails">রিলস বা ভিডিওর বিস্তারিত লিখুন:</label>
+            <textarea id="reelsDetails" class="form-control" rows="3"></textarea>
+            <br>
+            <button class="btn btn-primary" onclick="generateReelsTitle()">Generate</button>
+            <div id="generatedReelsOutput" class="mt-3"></div>
+            </div>
+
 
         <!-- Live Promote Form -->
         <div id="livePrompt" class="form-container">
@@ -161,6 +176,27 @@
 ${liveInfo}`;
             copyToClipboard(text, document.getElementById("generatedLiveOutput"));
         }
+        
+        function generateReelsTitle() {
+    const details = document.getElementById("reelsDetails").value;
+    if (!details.trim()) {
+        alert("দয়া করে বিস্তারিত লিখুন।");
+        return;
+    }
+    const text = `খুব সুন্দর করে টাইটেল এবং শিরোনাম লিখে দিবে যাতে সোশ্যাল মিডিয়া প্ল্যাটফর্ম এর র‍্যাঙ্ক করে ওইরকম। এবং শিরোনামের সঙ্গে নিচে কিছু হ্যাশট্যাগও লিখে দিবে বাংলা এবং ইংরেজি মিক্স অপ্রয়োজনীয় ট্যাগ দেওয়া দরকার নেই শুধু প্রয়োজনীয় যেটাগুলো রয়েছে সেগুলো দিতে হবে। যেমন আমি তোমাকে একটি শিরোনাম এবং ট্যাগ লিখে দিখাচ্ছি : 
+
+শিক্ষা মন্ত্রণালয় সমমান পরীক্ষার্থী দের পরীক্ষার তারিখ পেছনের দাবিতে সমাবেশ। 
+
+#student #ssc #Assembly #সমাবেশ #exam 
+#news #thenewsbanglatv  
+
+আশা করি বুঝতে পেরেছ: এখন নিচে আমি তোমাকে আমি একটি ভিডিও করেছি তার কিছু ভিডিওর ধারণকৃত চিত্রের কিছু তথ্য দিচ্ছি সে অনুযায়ী শেরও নাম্বার টাইটেল এবং ট্যাগ লিখে দিবে 
+Note: শিরোনাম লেখার ক্ষেত্রে দুইটা শিরোনাম লিখে দিবে আলাদা করে এবং ইউটিউবের জন্য আলাদা একটি সেকশনে শিরোনাম লিখে দিবে কারণ ইউটিউবে প্রথম শিরোনাম ঘরে একশত সংখ্যার শব্দের বেশি নেয় না তাই একশত সংখ্যার শব্দের মধ্যে হতে হবে। তবে ফেসবুকের ক্ষেত্রে লিমিটেশন নেই। :
+${details}`;
+    
+    copyToClipboard(text, document.getElementById("generatedReelsOutput"));
+}
+
     </script>
 </body>
 </html>
