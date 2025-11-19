@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>সোনার তরী — MCQ কুইজ</title>
+
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;600&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
+<!-- KaTeX (শুধু প্রয়োজনে গাণিতিক রেন্ডারিংয়ের জন্য)। -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+
+<style>
+  :root{
+    --bg-1:#0f1724; /* deep dark */
+    --bg-2:#121227;
+    --card:#131427;
+    --accent:#0f4c75;
+    --accent2:#533483;
+    --correct:#3498db; /* blue */
+    --correct-2:#2ecc71; /* green maybe for badges */
+    --wrong:#e74c3c;
+    --muted:#bfc7d6;
+    --glass: rgba(255,255,255,0.03);
+  }
+  html,body{height:100%}
+  body{
+    margin:0;
+    background: linear-gradient(180deg,var(--bg-1),var(--bg-2));
+    color:#eef2ff;
+    font-family:'Hind Siliguri','Inter',sans-serif;
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    line-height:1.5;
+    padding:18px;
+    box-sizing:border-box;
+  }
+
+  .container{
+    max-width:1100px;
+    margin:0 auto;
+    display:flex;
+    flex-direction:column;
+    gap:16px;
+  }
+
+  header{
+    display:flex;
+    gap:12px;
+    align-items:center;
+    justify-content:space-between;
+  }
+  .title{
+    display:flex;
+    gap:12px;
+    align-items:center;
+  }
+  .logo{
+    width:56px;height:56px;border-radius:10px;
+    background:linear-gradient(135deg,var(--accent),var(--accent2));
+    display:flex;align-items:center;justify-content:center;
+    font-weight:700;color:white;font-size:20px;
+    box-shadow:0 6px 18px rgba(0,0,0,0.6);
+  }
+  h1{margin:0;font-size:20px}
+  p.lead{margin:0;color:var(--muted);font-size:13px}
+
+  /* control bar */
+  .controls{
+    display:flex;
+    gap:8px;
+    align-items:center;
+  }
+  button{
+    background:var(--glass);
+    border:1px solid rgba(255,255,255,0.05);
+    color:inherit;
+    padding:10px 14px;
+    border-radius:10px;
+    cursor:pointer;
+    font-weight:600;
+    transition:transform .12s ease,box-shadow .12s ease,opacity .12s;
+  }
+  button:active{transform:translateY(1px)}
+  button.primary{
+    background:linear-gradient(90deg,var(--accent),var(--accent2));
+    color:white;
+    box-shadow:0 8px 30px rgba(15,76,117,0.18);
+  }
+  button.ghost{background:transparent;border:1px dashed rgba(255,255,255,0.04)}
+  button[disabled]{opacity:.5;cursor:not-allowed}
+
+  main{
+    display:grid;
+    grid-template-columns: 1fr 320px;
+    gap:18px;
+    align-items:start;
+  }
+
+  /* question list */
+  .quiz-area{
+    background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
+    border-radius:14px;
+    padding:18px;
+    min-height:420px;
+  }
+  .question-card{
+    background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.02));
+    border-radius:12px;
+    padding:14px;
+    margin-bottom:12px;
+    box-shadow: 0 6px 20px rgba(2,6,23,0.5);
+    border:1px solid rgba(255,255,255,0.02);
+    transition:transform .12s ease, box-shadow .12s;
+  }
+  .question-header{
+    display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;
+  }
+  .qnum{font-weight:700;color:var(--muted);font-size:14px}
+  .qtext{font-size:16px;margin:0 0 8px 0}
+
+  .options{display:flex;flex-direction:column;gap:8px}
+  .option{
+    display:flex;align-items:center;gap:12px;
+    background:rgba(255,255,255,0.02);
+    padding:10px;border-radius:10px;
+    cursor:pointer;border:1px solid rgba(255,255,255,0.02);
+  }
+  .option input{transform:scale(1.05);margin-right:6px}
+  .option.disabled{opacity:.6;pointer-events:none;}
+  .option.correct{background:linear-gradient(90deg,var(--correct), rgba(46,204,113,0.07));border:1px solid var(--correct)}
+  .option.wrong{background:linear-gradient(90deg, rgba(231,76,60,0.12), rgba(230,126,34,0.06));border:1px solid var(--wrong)}
+
+  /* sidebar */
+  aside.panel{
+    background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
+    border-radius:12px;padding:14px;height:100%;
+    position:sticky;top:18px;border:1px solid rgba(255,255,255,0.02)
+  }
+  .timer{
+    font-size:22px;font-weight:700;margin-bottom:8px;
+    color:var(--muted);
+  }
+  .progress{
+    height:12px;background:rgba(255,255,255,0.03);border-radius:8px;overflow:hidden;margin-bottom:12px;
+  }
+  .progress > i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));width:0%}
+  .meta{font-size:13px;color:var(--muted);margin-bottom:12px}
+  .nav-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+  .nav-grid button{padding:8px;font-size:13px;border-radius:8px}
+  .nav-grid button.completed{background:linear-gradient(90deg,var(--correct),var(--accent));color:#062437}
+  .result-panel{margin-top:12px;padding:12px;border-radius:10px;background:rgba(255,255,255,0.02)}
+
+  /* result colors */
+  .score{font-size:20px;font-weight:800;margin:6px 0}
+  .message{font-size:15px;margin-top:6px}
+
+  /* responsive */
+  @media (max-width:1000px){
+    main{grid-template-columns:1fr 300px}
+    .nav-grid{grid-template-columns:repeat(6,1fr)}
+  }
+  @media (max-width:780px){
+    main{grid-template-columns:1fr}
+    aside.panel{position:relative;top:auto}
+    .nav-grid{grid-template-columns:repeat(8,1fr)}
+  }
+
+  /* small helpers */
+  .muted{color:var(--muted);font-size:13px}
+  .badge{display:inline-block;padding:6px 8px;border-radius:8px;background:rgba(255,255,255,0.02);font-weight:700}
+  .kbd{background:rgba(0,0,0,0.2);padding:4px 6px;border-radius:6px;font-size:12px}
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <div class="title">
+      <div class="logo">সত</div>
+      <div>
+        <h1>“সোনার তরী” — ইন্টারেকটিভ MCQ কুইজ</h1>
+        <p class="lead">রবীন্দ্রনাথ সম্বন্ধীয় পাঠ ও প্রতীক বিশ্লেষণভিত্তিক ৩০টি প্রশ্ন — ডার্ক মোড ইন্টার‌ফেস</p>
+      </div>
+    </div>
+
+    <div class="controls">
+      <div class="muted">প্রশ্নঃ <span id="totalCount">30</span></div>
+      <button id="startBtn" class="primary">শুরু করুন</button>
+      <button id="submitBtn" disabled>সাবমিট</button>
+      <button id="retryBtn" class="ghost" style="display:none">পুনরায় চেষ্টা করুন</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="quiz-area" id="quizArea" aria-live="polite">
+      <!-- Questions will be injected here -->
+    </section>
+
+    <aside class="panel" aria-label="কুইজ বক্স">
+      <div class="timer" id="timer">সময়: 00:00</div>
+      <div class="progress" title="প্রগরেস">
+        <i id="progressBar" style="width:0%"></i>
+      </div>
+      <div class="meta"><span id="doneCount">০</span> টি সম্পন্ন • <span id="remaining">০</span> বাকি</div>
+
+      <div class="muted" style="margin-bottom:8px">নেভিগেশন — কী-বোর্ড</div>
+      <div class="muted" style="margin-bottom:10px"><span class="kbd">←</span> <span class="kbd">→</span> প্রশ্ন পরিবর্তন · <span class="kbd">Enter</span> উত্তর সিলেক্ট/সাবমিট</div>
+
+      <div class="nav-grid" id="navGrid" style="margin-top:10px">
+        <!-- question quick nav -->
+      </div>
+
+      <div id="resultContainer" style="margin-top:12px"></div>
+      <div style="margin-top:12px" class="muted">ফলাফল সংরক্ষণ (লোকাল): <label><input type="checkbox" id="saveLocal"> সংরক্ষণ</label></div>
+    </aside>
+  </main>
+</div>
+
+<script>
+/* =========================
+   Quiz Data (30 প্রশ্ন)
+   ========================= */
+const questions = [
+  { id:1, q:"'সোনার তরী' কবিতাটি কোন কবির রচনা?", options:["মাইকেল মধুসূদন দত্ত","রবীন্দ্রনাথ ঠাকুর","জীবনানন্দ দাশ","কাজী নজরুল ইসলাম"], answer:1, difficulty:"easy"},
+  { id:2, q:"কবিতাটি কোন ধরনের/শ্রেণির কবিতা বলা হয়?", options:["গীত","রূপক কবিতা","অলঙ্কারিক হান্দা","নাটকীয় কবিতা"], answer:1, difficulty:"easy"},
+  { id:3, q:"'সোনার তরী' কবিতাটির প্রকাশকাল (কাব্যগ্রন্থ) কখন?", options:["1894","1913","1905","1889"], answer:0, difficulty:"medium"},
+  { id:4, q:"কবিতায় 'সোনার ধান' দিয়ে কবি সাধারণত কী বোঝিয়েছেন?", options:["বাস্তব ধানক্ষেত","কবি-নায়কের খাবার","সৃষ্টিশীল মানুষের সৃষ্টি/কর্মফল","অর্থনৈতিক সম্পদ"], answer:2, difficulty:"medium"},
+  { id:5, q:"কবিতায় 'নৌকা' কোনের প্রতীক হিসেবে এসেছে?", options:["প্রেম","মহাকাল","প্রকৃতি","শিক্ষা"], answer:1, difficulty:"medium"},
+  { id:6, q:"কবিতায় 'মাঝি' মূলত কী প্রতীক করেছেন?", options:["অতিথি","মহাকাল/সময়ের বাহক","আশা","বিপদ"], answer:1, difficulty:"medium"},
+  { id:7, q:"'বাঁকা জল' কবিতায় সাধারণত কী প্রতীক করে?", options:["কালস্রোত / বিপদপূর্ণ স্রোত","সুখ-সমৃদ্ধি","প্রেমের বাঁধা","ভালোলাগা"], answer:0, difficulty:"medium"},
+  { id:8, q:"কবিতায় কাকে 'আমি একেলা' বলা হয়েছে যদি তা কবির ব্যক্তিসত্তা বোঝায়, তাহলে অর্থ কী হবে?", options:["কবি নিজেকে আলাদা করে দেখছেন","কৃষককে নিঃসঙ্গ বোঝানো","সমাজকে দূরে রাখা","উৎসবের বর্ণনা"], answer:0, difficulty:"hard"},
+  { id:9, q:"'সোনার তরী' কবিতায় কোন ঋতুর উল্লেখ আছে?", options:["শীত","বর্ষা","গ্রীষ্ম","শরৎ"], answer:1, difficulty:"easy"},
+  { id:10, q:"কবিতায় কৃষক কোথায় দাঁড়িয়ে আছে?", options:["পাড়ার রাস্তায়","শূন্য নদীর তীরে","বনের মধ্যে","শহরের উপত্যকায়"], answer:1, difficulty:"easy"},
+  { id:11, q:"কবিতায় মাঝে দেখা প্রাণবন্ততা ঘটায় -- কৃষক মাঝিকে কেন আনন্দিত হয়?", options:["মাঝিকে দেখে সে আর্তচিত্তে তার ধান নৌকায় নেওয়ার অনুরোধ করে","মাঝিকে দেখে সে ভয় পায়","মাঝিকে দেখে সে পালাতে চায়","মাঝিকে দেখে সে রাগ করে"], answer:0, difficulty:"medium"},
+  { id:12, q:"কোনটি কবিতার মাত্রা/ছন্দ নিয়ে বলা হয়েছে?", options:["বাইলি ছন্দ","মাত্রাবৃত্ত ছন্দ","স্বাধীন ছন্দ","দ্বন্দ্ব ছন্দ"], answer:1, difficulty:"medium"},
+  { id:13, q:"কবিতায় 'এখন আমারে লহো করুণা করে' লাইনটির আবেদন মূলত কার প্রতি?", options:["প্রকৃতি","মাজ্জ্বল (পাল) কে","মাঝি/মহাকালকে","পাঠককে"], answer:2, difficulty:"hard"},
+  { id:14, q:"কবিতায় 'শূন্য নদীর তীরে রহিনু পড়ি' থেকে কি ভাব প্রকাশ পায়?", options:["আবেগঘন পূর্ণতা","অপ্রাপ্তির বেদনা ও অপূর্ণতা","উৎসবমুখর আনন্দ","ধর্মীয় তৃপ্তি"], answer:1, difficulty:"medium"},
+  { id:15, q:"কবিতার কোন চরিত্রগুলো পাওয়া যায় (প্রধান)?", options:["কৃষক ও মাঝি","কৃষক, ভেড়া ও গাছ","কবি ও পাখি","নায়ক ও নায়িকা"], answer:0, difficulty:"easy"},
+  { id:16, q:"কবিতার রূপকাত্মক পাঠে 'কৃষক' কে প্রতীক করতে পারে?", options:["শুধু কৃষকই","কবিকে বা মানুষের সার্বিক ব্যক্তি সত্তাকে","শুধু সমাজকেই","শুধু পরিবেশ-পরিবর্তনকে"], answer:1, difficulty:"hard"},
+  { id:17, q:"কবিতায় 'সোনার তরী' কাকে নিয়ে চলে গেছে?", options:["কৃষককে","কৃষকের সোনার ধান (কর্মফল) কে","গ্রামকে","ঘোড়াকে"], answer:1, difficulty:"medium"},
+  { id:18, q:"কবিতায় মাঝি কিভাবে এসেছে?", options:["চিৎকার করে ডেকে","গান গেয়ে তরী বেয়ে আসে","শব্দ না করে আসে","পিঠে করে আসে"], answer:1, difficulty:"easy"},
+  { id:19, q:"প্রশ্নোত্তরে বলা হয়েছে—'তরুছায়া-মশিমাখা' শব্দটি দ্বারা কী বোঝানো হয়েছে?", options:["বনের ছায়া","গাছপালার ছায়ায় কালচে রং মাখা","সাধারণ আলো","কোনো খাবার"], answer:1, difficulty:"easy"},
+  { id:20, q:"কবিতায় 'পুণ্যপথ' শব্দের মানে কোনটি?", options:["পাপমুক্ত, পবিত্র পথ","ঝড়ের নাম","নৌকার অংশ","কোনো শতরূপ"], answer:0, difficulty:"medium"},
+  { id:21, q:"'সোনার তরী' কবিতাটি কোন কাব্যগ্রন্থ থেকে নেয়া হয়েছে?", options:["ঘুড়ি/অন্য কাব্যগ্রন্থ","সোনার তরী (কাব্যগ্রন্থ)","গীতাঞ্জলি","কথাসাহিত্যের সংগ্রহ"], answer:1, difficulty:"easy"},
+  { id:22, q:"কবিতায় মাঝিকেই যদি 'মহাকাল' ধরা হয়, তবে কবিতার সামগ্রিক বিষয়ে কী প্রতিফলিত হবে?", options:["কালচক্র, মৃত্যু ও চাকরী","প্রকৃতির সৌন্দর্য","শৈশবের স্মৃতি","রাজনৈতিক বার্তা"], answer:0, difficulty:"hard"},
+  { id:23, q:"প্রশ্নোত্তরে বলা হয়েছে — নৌকার অর্থ কী? আপনার সঠিক উত্তর হলো:", options:["জীবন-যাত্রার প্রতীক","মহাকালের বাহক (রূপক)","শস্যের রকম","শান্তির চিহ্ন"], answer:1, difficulty:"medium"},
+  { id:24, q:"'সোনার তরী' কবিতায় ধান কাটা শেষে কৃষক কী করে?", options:["আহ্লাদে নাচে","পার-সংকটকে নিয়ে অপেক্ষা করে","নৌকা ভেঙ্গে ফেলে","শহরে চলে যায়"], answer:1, difficulty:"medium"},
+  { id:25, q:"কবিতায় 'তুর্যে' শব্দের প্রকৃত অর্থ এখানে কীভাবে ব্যবহার হয়েছে?", options:["রণবাদ্য","বজ্রপাতের (তুর্যে ব্যঞ্জনা)","সঙ্গীত","ফসল কাটার পদ্ধতি"], answer:1, difficulty:"medium"},
+  { id:26, q:"কবিতার প্রতীকী অর্থ বিশ্লেষণে — 'মাঝি' ধান নিয়ে চলে গেলেও কৃষককে নেয়নি, এটি কী নির্দেশ করে?", options:["অসামাজিকতা","মহাকাল মানুষকে নেয় না—শুধু কর্মফল নেয়","মাঝিকে অপরাধী হিসেবে দেখায়","কৃষককে সযত্নে রেখে দেয়"], answer:1, difficulty:"hard"},
+  { id:27, q:"কবিতায় 'ভৈরব' শব্দটি কীভাবে ব্যবহার হয়েছে?", options:["শিবের ভয়ঙ্কর মূর্তির রূপে","প্রেমের প্রতীক","রহস্যময় প্রহরী","শান্তির প্রতীক"], answer:0, difficulty:"medium"},
+  { id:28, q:"রবীন্দ্রনাথের ছদ্মনাম কী?", options:["ভানুসিংহ ঠাকুর","বিভূতিভূষণ","বঙ্কিমচন্দ্র","হাবিবুর রহমান"], answer:0, difficulty:"easy"},
+  { id:29, q:"কবিতার পাঠে 'সোনার তরী' যদি মহাকালের প্রতীক হয়, তাহলে 'সোনার ধান' কী হতে পারে?", options:["মানবসৃষ্ট কর্মফল / কাব্যকর্ম","জাতীয় সম্পদ","শুধু ধান","শরীরিক জিনিস"], answer:0, difficulty:"hard"},
+  { id:30, q:"কবিতায় প্রদীপ-সংকেত/অনুরোধে কৃষক কাকে কী অনুনয় করেছে?", options:["মাঝিকে — সোনার ধান নৌকায় তুলে নেয়ার অনুনয়","প্রকৃতিকে — বৃষ্টি থামানোর অনুরোধ","পশুকে — খাদ্য দেওয়ার অনুনয়","গৌরবকে — শহরে যাওয়ার অনুরোধ"], answer:0, difficulty:"medium"}
+];
+
+/* Utilities */
+const bnDigits = ['০','১','২','৩','৪','৫','৬','৭','৮','৯'];
+function toBanglaNumber(n){
+  return String(n).split('').map(ch => (/\d/.test(ch)?bnDigits[ch]:ch)).join('');
+}
+
+/* State */
+let totalQuestions = questions.length;
+let answers = Array(totalQuestions).fill(null); // store selected option index
+let started = false;
+let timerInterval = null;
+let perQuestionSeconds = 150; // suggest 2-3 minutes per question -> 150s (2m30s)
+let totalSeconds = perQuestionSeconds * totalQuestions;
+let remainingSeconds = totalSeconds;
+let currentIndex = 0;
+
+/* DOM refs */
+const quizArea = document.getElementById('quizArea');
+const startBtn = document.getElementById('startBtn');
+const submitBtn = document.getElementById('submitBtn');
+const retryBtn = document.getElementById('retryBtn');
+const timerEl = document.getElementById('timer');
+const progressBar = document.getElementById('progressBar');
+const navGrid = document.getElementById('navGrid');
+const doneCountEl = document.getElementById('doneCount');
+const remainingEl = document.getElementById('remaining');
+const resultContainer = document.getElementById('resultContainer');
+const saveLocalCheckbox = document.getElementById('saveLocal');
+
+document.getElementById('totalCount').innerText = totalQuestions;
+
+/* Render questions (initially disabled) */
+function renderQuestions(){
+  quizArea.innerHTML = '';
+  questions.forEach((item, idx) => {
+    const card = document.createElement('div');
+    card.className = 'question-card';
+    card.id = 'qcard-'+idx;
+    card.setAttribute('data-index', idx);
+
+    const header = document.createElement('div');
+    header.className = 'question-header';
+    const qnum = document.createElement('div');
+    qnum.className = 'qnum';
+    qnum.innerText = `${toBanglaNumber(idx+1)}।`;
+    const difficulty = document.createElement('div');
+    difficulty.className = 'muted';
+    difficulty.innerText = item.difficulty === 'easy' ? 'সহজ' : (item.difficulty==='medium'?'মাঝারি':'কঠিন');
+    header.appendChild(qnum);
+    header.appendChild(difficulty);
+
+    const qtext = document.createElement('div');
+    qtext.className = 'qtext';
+    qtext.innerText = item.q;
+
+    const optionsDiv = document.createElement('div');
+    optionsDiv.className = 'options';
+    item.options.forEach((opt, oi) => {
+      const optDiv = document.createElement('label');
+      optDiv.className = 'option';
+      optDiv.tabIndex = 0;
+      optDiv.setAttribute('data-q', idx);
+      optDiv.setAttribute('data-opt', oi);
+
+      const radio = document.createElement('input');
+      radio.type = 'radio';
+      radio.name = 'q-'+idx;
+      radio.value = oi;
+      radio.disabled = true; // initially disabled until start
+      radio.setAttribute('aria-label', `অপশন ${toBanglaNumber(oi+1)}: ${opt}`);
+
+      const span = document.createElement('div');
+      span.innerText = opt;
+
+      optDiv.appendChild(radio);
+      optDiv.appendChild(span);
+
+      // click behavior
+      optDiv.addEventListener('click', (e) => {
+        if(!started) return;
+        const q = Number(optDiv.getAttribute('data-q'));
+        const o = Number(optDiv.getAttribute('data-opt'));
+        selectOption(q,o);
+      });
+      // keyboard support
+      optDiv.addEventListener('keydown', (e) => {
+        if(e.key === 'Enter' || e.key === ' '){
+          e.preventDefault();
+          optDiv.click();
+        }
+      });
+
+      optionsDiv.appendChild(optDiv);
+    });
+
+    card.appendChild(header);
+    card.appendChild(qtext);
+    card.appendChild(optionsDiv);
+    quizArea.appendChild(card);
+  });
+}
+renderQuestions();
+
+/* render nav grid */
+function renderNav(){
+  navGrid.innerHTML = '';
+  for(let i=0;i<totalQuestions;i++){
+    const btn = document.createElement('button');
+    btn.innerText = toBanglaNumber(i+1);
+    btn.className = '';
+    btn.setAttribute('data-i', i);
+    btn.addEventListener('click', ()=> {
+      scrollToQuestion(i);
+    });
+    navGrid.appendChild(btn);
+  }
+}
+renderNav();
+
+/* scroll to question */
+function scrollToQuestion(i){
+  const el = document.getElementById('qcard-'+i);
+  if(el){
+    el.scrollIntoView({behavior:'smooth',block:'center'});
+    currentIndex = i;
+    highlightNav();
+  }
+}
+
+/* Select option */
+function selectOption(qIndex, optIndex){
+  answers[qIndex] = optIndex;
+  // mark radio
+  const card = document.getElementById('qcard-'+qIndex);
+  const radios = card.querySelectorAll('input[type=radio]');
+  radios.forEach(r => r.checked = false);
+  radios[optIndex].checked = true;
+
+  updateProgress();
+  highlightNav();
+}
+
+/* Update progress */
+function updateProgress(){
+  const done = answers.filter(a=>a!==null).length;
+  doneCountEl.innerText = toBanglaNumber(done);
+  remainingEl.innerText = toBanglaNumber(totalQuestions - done);
+  const perc = Math.round((done/totalQuestions)*100);
+  progressBar.style.width = perc + '%';
+
+  // nav grid marks
+  Array.from(navGrid.children).forEach((btn, idx) => {
+    btn.classList.toggle('completed', answers[idx]!==null);
+  });
+}
+
+/* Start quiz */
+startBtn.addEventListener('click', startQuiz);
+function startQuiz(){
+  if(started) return;
+  started = true;
+  // enable radios
+  document.querySelectorAll('input[type=radio]').forEach(r => r.disabled = false);
+  startBtn.disabled = true;
+  submitBtn.disabled = false;
+  // start timer
+  remainingSeconds = totalSeconds;
+  updateTimerDisplay();
+  timerInterval = setInterval(()=> {
+    remainingSeconds--;
+    updateTimerDisplay();
+    if(remainingSeconds<=0){
+      clearInterval(timerInterval);
+      finalizeQuiz();
+    }
+  },1000);
+}
+
+/* Update timer */
+function updateTimerDisplay(){
+  const mm = Math.floor(remainingSeconds/60);
+  const ss = remainingSeconds%60;
+  timerEl.innerText = `সময়: ${String(mm).padStart(2,'0')}:${String(ss).padStart(2,'0')}`;
+}
+
+/* Submit quiz */
+submitBtn.addEventListener('click', ()=> {
+  if(!started) { alert('প্রথমে শুরু করুন'); return; }
+  if(!confirm('আপনি কি কুইজটি সাবমিট করতে চান?')) return;
+  finalizeQuiz();
+});
+
+function finalizeQuiz(){
+  // disable interactions
+  started = false;
+  clearInterval(timerInterval);
+  document.querySelectorAll('input[type=radio]').forEach(r => r.disabled = true);
+  submitBtn.disabled = true;
+  startBtn.disabled = true;
+  retryBtn.style.display = 'inline-block';
+
+  // compute score and display
+  displayResults();
+}
+
+/* Display Results */
+function displayResults(){
+  let correctCount = 0;
+  questions.forEach((q, idx) => {
+    const card = document.getElementById('qcard-'+idx);
+    const optionEls = card.querySelectorAll('.option');
+    optionEls.forEach((optEl, oi) => {
+      optEl.classList.remove('correct','wrong','disabled');
+      optEl.classList.add('disabled');
+      // reveal correct/wrong
+      if(oi === q.answer){
+        optEl.classList.add('correct');
+      }
+      if(answers[idx] === oi && answers[idx] !== q.answer){
+        optEl.classList.add('wrong');
+      }
+    });
+    if(answers[idx] === q.answer) correctCount++;
+  });
+
+  const percent = Math.round((correctCount/totalQuestions)*100);
+  const scoreText = `${toBanglaNumber(correctCount)}/${toBanglaNumber(totalQuestions)} (${percent}%)`;
+
+  let message = '';
+  if(percent >= 70){
+    message = '✅ চমৎকার! আপনি ভালো করেছেন। 🎉';
+  } else {
+    message = 'আপনার আরো অনুশীলন প্রয়োজন। চেষ্টা চালিয়ে যান! 📚';
+  }
+
+  const timeTaken = totalSeconds - remainingSeconds;
+  const mm = Math.floor(timeTaken/60);
+  const ss = timeTaken%60;
+
+  resultContainer.innerHTML = `
+    <div class="result-panel">
+      <div class="score">স্কোর: ${scoreText}</div>
+      <div class="muted">সময় নেওয়া: ${String(mm).padStart(2,'0')}:${String(ss).padStart(2,'0')}</div>
+      <div class="message">${message}</div>
+    </div>
+  `;
+
+  // optionally save to localStorage
+  if(saveLocalCheckbox.checked){
+    const record = {
+      date: new Date().toISOString(),
+      correct: correctCount,
+      total: totalQuestions,
+      percent,
+      timeTaken
+    };
+    const key = 'sonar_tori_quiz_results';
+    const prev = JSON.parse(localStorage.getItem(key) || "[]");
+    prev.push(record);
+    localStorage.setItem(key, JSON.stringify(prev));
+  }
+
+  // show which q wrong/correct in nav
+  Array.from(navGrid.children).forEach((btn, idx) => {
+    btn.classList.remove('completed');
+    if(answers[idx] === null) { btn.style.opacity = .5; }
+    else {
+      if(answers[idx] === questions[idx].answer){
+        btn.style.background = 'linear-gradient(90deg,var(--correct),var(--accent))';
+        btn.style.color = '#062437';
+      } else {
+        btn.style.background = 'linear-gradient(90deg,rgba(231,76,60,0.9),rgba(230,126,34,0.8))';
+        btn.style.color = '#fff';
+      }
+    }
+  });
+}
+
+/* Retry */
+retryBtn.addEventListener('click', ()=> {
+  if(!confirm('আসলে কি পুনরায় চেষ্টা করবেন? পূর্বের উত্তর মুছে যাবে।')) return;
+  // reset
+  answers = Array(totalQuestions).fill(null);
+  started = false;
+  clearInterval(timerInterval);
+  remainingSeconds = totalSeconds;
+  updateTimerDisplay();
+  // reset UI
+  document.querySelectorAll('input[type=radio]').forEach(r => { r.checked = false; r.disabled = true; });
+  document.querySelectorAll('.option').forEach(o => { o.classList.remove('correct','wrong','disabled'); o.classList.remove('selected'); });
+  submitBtn.disabled = true;
+  startBtn.disabled = false;
+  retryBtn.style.display = 'none';
+  resultContainer.innerHTML = '';
+  // reset nav grid
+  Array.from(navGrid.children).forEach(btn => {
+    btn.style.background = '';
+    btn.style.color = '';
+    btn.style.opacity = 1;
+    btn.classList.remove('completed');
+  });
+  updateProgress();
+});
+
+/* keyboard navigation (left/right to move, Enter to focus first option) */
+document.addEventListener('keydown', (e) => {
+  if(e.key === 'ArrowDown' || e.key === 'ArrowRight'){
+    // move to next question
+    currentIndex = Math.min(totalQuestions-1, currentIndex+1);
+    scrollToQuestion(currentIndex);
+  } else if(e.key === 'ArrowUp' || e.key === 'ArrowLeft'){
+    currentIndex = Math.max(0, currentIndex-1);
+    scrollToQuestion(currentIndex);
+  } else if(e.key === 'Enter'){
+    // if started and focused on question card, try to toggle first option
+    const card = document.getElementById('qcard-'+currentIndex);
+    if(card){
+      const firstOpt = card.querySelector('.option');
+      if(firstOpt) firstOpt.click();
+    }
+  }
+});
+
+/* initial UI updates */
+updateProgress();
+updateTimerDisplay();
+
+/* accessibility: focus first card */
+setTimeout(()=> {
+  const firstCard = document.getElementById('qcard-0');
+  if(firstCard) firstCard.setAttribute('tabindex', '-1');
+},500);
+
+/* Prevent console errors: add simple checks */
+window.addEventListener('error', e => {
+  console.warn('Error caught:', e.message);
+});
+</script>
+</body>
+</html>
